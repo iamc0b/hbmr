@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Corstorphine at the HBMR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: map-sheet page — a big 3D course map with a side "control card", then chart strips and ledgers below */
+:root{
+  --paper:#EDF0EA; --panel:#F8F9F5; --ink:#1A2326; --muted:#5B6866; --rule:#CDD5CD; --accent:#A8461F;
+  --good:#2F7D4F; --goodbg:#DCEFE2; --mid:#7A6A2E; --midbg:#F2EBD2; --bad:#A33A2E; --badbg:#F6DEDA; --topbg:#C9E7D3;
+  --sky:#DCE4E3;
+  --s1:#2563EB; --s2:#E11D48; --s3:#D97706; --s4:#7C3AED; --s5:#0891B2; --s6:#475569;
+  --up:#B4471C; --down:#0F6E8C; --mixed:#7D8270;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111618; --panel:#192022; --ink:#E2E8E3; --muted:#93A19E; --rule:#2B3537; --accent:#E2825A;
+  --good:#7CCB98; --goodbg:#1C3326; --mid:#D7C27A; --midbg:#33301E; --bad:#F09A8E; --badbg:#3A2220; --topbg:#21452F;
+  --sky:#1C2527; --s6:#94A3B8; --up:#F08A5D; --down:#5BB8D6; --mixed:#A3A893; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111618; --panel:#192022; --ink:#E2E8E3; --muted:#93A19E; --rule:#2B3537; --accent:#E2825A;
+  --good:#7CCB98; --goodbg:#1C3326; --mid:#D7C27A; --midbg:#33301E; --bad:#F09A8E; --badbg:#3A2220; --topbg:#21452F;
+  --sky:#1C2527; --s6:#94A3B8; --up:#F08A5D; --down:#5BB8D6; --mixed:#A3A893; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:20px;padding-block:28px 48px;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:clamp(2.1rem,5vw,3.4rem);line-height:1}
+h2{font-size:1.75rem;line-height:1.1}
+h3{font-size:1.2rem}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.hdr{display:flex;flex-direction:column;gap:14px}
+.lede{max-width:68ch;margin:0;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.stat{background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--display);font-size:1.9rem;line-height:1.05;font-weight:600}
+.stat span{font-size:.8rem;color:var(--muted)}
+.sec{display:flex;flex-direction:column;gap:14px}
+.sechead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+.sechead p{margin:0;color:var(--muted);max-width:70ch}
+.mapgrid{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(300px,1fr);gap:16px;align-items:start}
+@media (max-width:920px){.mapgrid{grid-template-columns:1fr}}
+.mapbox{position:relative;border:1px solid var(--rule);background:var(--sky);height:min(68vh,620px);min-height:360px;overflow:hidden;border-radius:4px}
+.mapbox canvas{display:block;width:100%;height:100%;touch-action:none}
+.maptag{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:4px;pointer-events:none;max-width:calc(100% - 20px)}
+.badge{font-family:var(--mono);font-size:.7rem;background:color-mix(in srgb,var(--panel) 88%,transparent);border:1px solid var(--rule);padding:3px 7px;border-radius:3px;color:var(--ink);width:max-content;max-width:100%}
+.badge.warn{border-color:var(--accent);color:var(--accent)}
+.lbl{position:absolute;transform:translate(-50%,-100%);font-family:var(--mono);font-size:.66rem;white-space:nowrap;pointer-events:none;color:#1A2326;background:rgba(255,255,255,.82);padding:1px 5px;border-radius:2px;margin-top:-6px}
+.lbl.ho{font-weight:600;background:rgba(255,255,255,.95)}
+.rlbl{position:absolute;transform:translate(-50%,-100%);font-family:var(--mono);font-size:.68rem;font-weight:600;white-space:nowrap;pointer-events:none;color:#fff;padding:1px 6px;border-radius:2px;margin-top:-22px}
+.mapctl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:.85rem}
+.mapctl label{display:flex;align-items:center;gap:6px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h3{display:flex;justify-content:space-between;align-items:baseline}
+select,button,input[type=range]{font:inherit}
+select{background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:5px 6px;max-width:100%;min-width:0}
+button{background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--ink)}
+button.pri{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.addrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button{font-size:.8rem;padding:3px 8px}
+.entries{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.entry{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:6px 8px;border:1px solid var(--rule);border-radius:3px;background:var(--paper)}
+.sw{width:12px;height:12px;border-radius:50%}
+.entry .nm{font-size:.86rem;line-height:1.25;min-width:0}
+.entry .nm small{display:block;color:var(--muted);font-size:.75rem}
+.entry .st{font-family:var(--mono);font-size:.74rem;text-align:right;color:var(--muted);line-height:1.25}
+.entry .st b{color:var(--ink);font-weight:600;display:block;font-size:.8rem}
+.x{border:none;background:none;color:var(--muted);padding:0 4px;font-size:1.1rem;line-height:1}
+.play{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;align-items:center}
+.play input{width:100%}
+.clock{font-family:var(--mono);font-size:1rem;min-width:7ch;text-align:right}
+.strip{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:920px){.strip{grid-template-columns:1fr}}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--mono);font-size:10px}
+.chart .ax{stroke:var(--rule)}
+.cap{font-size:.8rem;color:var(--muted);margin:0}
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.84rem}
+th,td{padding:5px 10px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel)}
+td.r,th.r{text-align:right}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--paper)}
+.chip{display:inline-block;font-family:var(--mono);font-size:.68rem;padding:0 5px;border-radius:2px;min-width:3.2ch;text-align:center;margin-left:6px}
+.p1{background:var(--topbg);color:var(--good)} .p2{background:var(--goodbg);color:var(--good)} .p3{background:var(--midbg);color:var(--mid)} .p4{background:var(--badbg);color:var(--bad)}
+.best{font-weight:700}
+.legs4{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.legs4 .card{padding:12px}
+.legs4 table td,.legs4 table th{padding:4px 6px}
+.legmeta{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--paper);font-size:.78rem;padding:6px 8px;border-radius:3px;z-index:9;max-width:260px;line-height:1.35}
+.foot{font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--rule);padding-top:14px}
+.foot p{margin:0;max-width:95ch}
+.foot a,.card a{color:var(--accent)}
+.loader{display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px dashed var(--accent);padding:4px 8px;border-radius:3px;color:var(--accent);font-size:.8rem}
+.loader input{position:absolute;width:1px;height:1px;opacity:0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted)}
+.legend i{display:inline-block;width:18px;height:4px;vertical-align:middle;margin-right:4px;border-radius:2px}
+.qrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:6px}
+.qbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.group{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:8px}
+.tag{font-family:var(--mono);font-size:.66rem;color:var(--muted);border:1px solid var(--rule);border-radius:2px;padding:0 4px;margin-left:4px}
+.c-U{color:var(--up)} .c-D{color:var(--down)} .c-M{color:var(--mixed)} .c-X{color:var(--muted)}
+.g{font-size:.72rem;margin-right:5px}
+.climbctl{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.85rem}
+.climbctl label{display:flex;align-items:center;gap:6px}
+.dumb{overflow-x:auto}
+.dumb svg{min-width:600px;width:100%;height:auto;display:block}
+.dumb text{fill:var(--muted);font-family:var(--mono);font-size:10.5px}
+.dumb .nm{fill:var(--ink);font-family:var(--body);font-size:12.5px}
+.dumb .row:hover rect.hl{fill:var(--paper)}
+.two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+@media (max-width:920px){.two{grid-template-columns:1fr}}
+.legsec{display:flex;gap:6px;flex-wrap:wrap}
+.legsec button{font-size:.76rem;padding:2px 8px}
+.heat td,.heat th{padding:4px 6px;text-align:center}
+.heat td.yr,.heat th.yr{text-align:left}
+.heat td.hc{cursor:pointer;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.76rem;line-height:1.2;border-left:1px solid var(--panel)}
+.heat td.hc small{display:block;font-size:.64rem;color:var(--ink);opacity:.75}
+.heat td.hc:hover{outline:2px solid var(--ink);outline-offset:-2px}
+.heat td.tot{border-left:2px solid var(--ink)}
+.hlegend{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--muted)}
+.hlegend .bar{width:160px;height:10px;border-radius:2px;background:linear-gradient(90deg,rgba(47,158,91,.7),rgba(232,197,71,.7),rgba(210,69,47,.7))}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="hdr">
+    <div class="eyebrow">Hodgson Brothers Mountain Relay · Patterdale · 2000–2024</div>
+    <h1>Corstorphine AAC on the HBMR fells</h1>
+    <p class="lede">Every Corstorphine team at the Hodgson Brothers (formerly Ian Hodgson) Mountain Relay, with checkpoint splits from 2009 onwards. Pick any pairings below and race them against each other across a 3D model of the course.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section class="sec" aria-labelledby="mapH">
+    <div class="sechead">
+      <h2 id="mapH">The course in 3D</h2>
+      <p>Drag to orbit, scroll or pinch to zoom. Dots show where each pairing was at the same elapsed time since their own start.</p>
+    </div>
+    <div class="mapgrid">
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+        <div class="mapbox" id="mapbox">
+          <div class="maptag">
+            <span class="badge" id="routeBadge">Route</span>
+            <span class="badge warn" id="terrBadge">Terrain</span>
+          </div>
+        </div>
+        <div class="play">
+          <button class="pri" id="playBtn" aria-label="Play">▶ Play</button>
+          <input type="range" id="tSlider" min="0" max="1000" value="0" step="1" aria-label="Elapsed time">
+          <span class="clock" id="clock">0:00</span>
+          <select id="spd" aria-label="Playback speed">
+            <option value="60">60×</option><option value="180" selected>180×</option><option value="400">400×</option><option value="900">900×</option>
+          </select>
+        </div>
+        <div class="mapctl">
+          <label for="mapYear">Course drawn <select id="mapYear"></select></label>
+          <label for="exag">Relief ×<span id="exagV" class="num">1.5</span> <input type="range" id="exag" min="1" max="3" step="0.1" value="1.5"></label>
+          <label for="lbls"><input type="checkbox" id="lbls" checked> Checkpoint labels</label>
+          <button id="resetV">Reset view</button>
+          <label class="loader" for="ascIn">Load OS Terrain 50 (.zip or .asc)<input type="file" id="ascIn" accept=".zip,.asc,.txt" multiple></label>
+          <label for="heatRoute"><input type="checkbox" id="heatRoute"> Colour course by split position</label>
+        </div>
+      </div>
+
+      <aside class="card" aria-labelledby="cmpH">
+        <h3 id="cmpH">Pairings <span class="muted num" id="cnt" style="font-size:.8rem"></span></h3>
+        <ul class="entries" id="entries"></ul>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="eyebrow">Same stretch of fell, any year</div>
+          <div class="qrow">
+            <select id="qSec" aria-label="Route section"></select>
+            <select id="qDir" aria-label="Direction"><option value="fwd">Direction run now</option><option value="rev">Reversed (2007–10)</option></select>
+          </div>
+          <div class="qbtns"><button id="qFast">6 fastest</button><button id="qRecent">6 most recent</button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="eyebrow">Add one run</div>
+          <div class="addrow">
+            <select id="addYear" aria-label="Year"></select>
+            <select id="addLeg" aria-label="Leg"></select>
+            <button id="addBtn" class="pri">Add</button>
+          </div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">Other comparisons</div>
+          <div class="presets" id="presets"></div>
+        </div>
+        <p class="cap">Legs are grouped by the stretch of fell they cover, so 2003's Leg 2 (Patterdale → Hartsop) sits with today's Leg 1, and keeps its own leg number. Between checkpoints, and across whole legs before 2009 where only the leg time survives, positions are estimated with Naismith's rule (1 km flat ≈ 125 m of climb). Up to six pairings.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="strip">
+    <div class="card chart"><h3>Profile <span class="muted num" id="profMeta" style="font-size:.78rem"></span></h3><div id="profile"></div><p class="cap" id="profCap"></p></div>
+    <div class="card chart"><h3 id="progH">Gap to the fastest</h3><div id="progress"></div><p class="cap" id="progCap"></p></div>
+  </section>
+
+  <section class="sec" aria-labelledby="splitH">
+    <div class="sechead"><h2 id="splitH">Split by split</h2><p>Leg split, field position on that split, and elapsed time. Fastest split in each row is bold.</p></div>
+    <div class="tblwrap" id="splits"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="heatH">
+    <div class="sechead"><h2 id="heatH">Heat maps</h2><p>Green is good, red is costly. Click a cell to add that run to the 3D comparison.</p></div>
+    <div class="card">
+      <div class="climbctl"><h3>Legs and totals by year</h3><label for="hmLegMode">Colour by <select id="hmLegMode"><option value="pos">Field position</option><option value="pct">Time vs club best on that route</option></select></label></div>
+      <div class="tblwrap heat" id="hmLegs" style="border:none"></div>
+      <p class="cap" id="hmLegsCap"></p>
+    </div>
+    <div class="card">
+      <div class="climbctl"><h3>Split by split, 2011–2024</h3><label for="hmSplitMode">Colour by <select id="hmSplitMode"><option value="pct">Split time vs club best</option><option value="pos">Field position on split</option></select></label></div>
+      <div class="tblwrap heat" id="hmSplits" style="border:none"></div>
+      <p class="cap">Course as run from Patterdale, excluding the 2017 short course. Columns follow today's order; the leg 3 handover column covers Hartsop Hall, Sykeside and Brotherswater. Split positions exist from 2015 only. A split nobody else in the club has run the same way (2013's merged footbridge-to-Hart Crag) is left uncoloured.</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="climbH">
+    <div class="sechead"><h2 id="climbH">Climbers and descenders</h2><p>Each checkpoint split is tagged <span class="c-U">▲ uphill</span>, <span class="c-D">▼ downhill</span> or <span class="c-M">◆ mixed</span> from the ground it crosses. Below is each runner's average field position on each kind of split, from the years the sheet records split positions (2009–10, 2015–24). Pairs share a time, so both runners get the pair's split.</p></div>
+    <div class="stats" id="climbStats"></div>
+    <div class="card">
+      <div class="climbctl">
+        <label for="cSort">Order <select id="cSort"><option value="diff">Climbers first</option><option value="rdiff">Descenders first</option><option value="u">Best uphill</option><option value="d">Best downhill</option><option value="n">Most splits</option></select></label>
+        <label for="cWeight">Average <select id="cWeight"><option value="form" selected>Current form (recent years count more)</option><option value="plain">All years equally</option></select></label>
+        <label for="cMin">At least <select id="cMin"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select> up and down splits</label>
+        <span class="legend"><span><span class="c-U">▲</span> uphill avg</span><span><span class="c-D">▼</span> downhill avg</span><span><span class="c-M">◆</span> mixed avg</span><span>left is better</span></span>
+      </div>
+      <div class="dumb" id="dumb"></div>
+    </div>
+    <div class="two">
+      <div class="tblwrap" id="pairsUD"></div>
+      <div class="tblwrap" id="clubUD"></div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="histH">
+    <div class="sechead"><h2 id="histH">Every relay since 2000</h2><p>Final position (higher is better). Filled dots are open teams, rings are mixed. Click a year with splits to add the whole team run.</p></div>
+    <div class="card chart" id="history"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="legH">
+    <div class="sechead"><h2 id="legH">Leg board</h2><p>Every club run since 2000, grouped by the stretch of fell rather than that year's leg number. The tag shows which leg it was that year. Reverse-direction runs (2007, 2009, 2010) and the 2017 short course are listed separately. Click a row to add it.</p></div>
+    <div class="legs4" id="legboard"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="runH">
+    <div class="sechead"><h2 id="runH">Runners</h2><p>Click a runner to open their card, with bests in 5-year periods from their first relay. Route sections use today's leg numbering; the lean column comes from the climbers and descenders analysis.</p></div>
+    <div class="tblwrap" id="runners"></div>
+    <div class="card" id="rDetail">
+      <div class="climbctl"><h3>Runner card</h3><label for="rSel"><select id="rSel" aria-label="Runner"></select></label><button id="rRecent">Race their 6 most recent legs</button></div>
+      <div class="tblwrap" id="eras" style="border:none"></div>
+      <p class="cap" id="eraCap"></p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p><b>Data.</b> Results, splits and pairings from the club's HBMR results sheet. Field positions on splits are shown where the sheet records them (2009–2010, 2015–2024). 2001 cancelled (foot and mouth), 2008 no record, 2019 entry missed, 2020 COVID, 2025 cancelled for storm. In 2013 the footbridge control has no time, so its split is merged into Hart Crag.</p>
+    <p><b>Route.</b> Checkpoints from the six-figure grid references on <a href="https://hbmr.org.uk/leg-routes/" target="_blank" rel="noopener">hbmr.org.uk/leg-routes</a>. Lines between checkpoints follow the usual paths but are hand-drawn, not GPS tracks.</p>
+    <p><b>Terrain.</b> <span id="terrNote"></span> For true elevations, download OS Terrain 50 (free OpenData, format "ASCII Grid and GML (Grid)", coverage all of GB) from the <a href="https://osdatahub.os.uk/downloads/open/Terrain50" target="_blank" rel="noopener">OS Data Hub</a>. Load the whole downloaded zip with the button under the map, or for speed just the four tile zips from its data/ny folder (ny30, ny31, ny40, ny41). The page picks out the Patterdale tiles itself.</p>
+  </footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script id="data">
+/* ---------- Results data (Corstorphine AAC only) ---------- */
+const CPS_2016 = ['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Hartsop Hall','Footbridge','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'];
+const RACES = [
+ {y:2000,pos:27,cat:'Open',time:'4:49:53',legs:[["Christopher O'Brien","David Law",'1:28:00',null,'Sykeside → Patterdale'],["John O'Hara","Martyn Tunstall",'50:44',null,'Patterdale → Hartsop'],["Keith Hood","Paul O'Brien",'1:27:20',null,'Hartsop → Kirkstone'],["Moray Anderson","Steven O'Brien",'1:03:49',null,'Kirkstone → Sykeside']]},
+ {y:2001,none:'Cancelled: foot and mouth'},
+ {y:2002,pos:34,cat:'Open',time:'4:47:57',legs:[["David Law","Timothy Norwood",'1:32:31',null,'Sykeside → Patterdale'],["John O'Hara","Martyn Tunstall",'50:09',null,'Patterdale → Hartsop'],["Christopher O'Brien","Keith Hood",'1:24:33',null,'Hartsop → Kirkstone'],["Moray Anderson","Steven O'Brien",'1:00:44',null,'Kirkstone → Sykeside']]},
+ {y:2003,pos:35,cat:'Open',time:'4:48:57',legs:[["Christopher O'Brien","Steven O'Brien",'1:22:45',null,'Sykeside → Patterdale'],["Moray Anderson","Tom Ferrington",'40:52',null,'Patterdale → Hartsop'],["David Law","Keith Hood",'1:24:15',null,'Hartsop → Kirkstone'],["Martyn Tunstall","Paul O'Brien",'1:21:05',null,'Kirkstone → Sykeside']]},
+ {y:2004,pos:59,cat:'Open',time:'5:55:11',legs:[["Keith Hood","Kris Berry",'1:34:39',null,'Sykeside → Patterdale'],["Martyn Tunstall","Paul O'Brien",'50:44',null,'Patterdale → Hartsop'],["Bryan Clark","David Henderson",'2:00:55',null,'Hartsop → Kirkstone'],["David Law","Steven O'Brien",'1:28:53',null,'Kirkstone → Sykeside']]},
+ {y:2005,pos:22,cat:'Open',time:'4:41:21',legs:[["Moray Anderson","Tom Ferrington",'1:17:09',null,'Sykeside → Patterdale'],["Christopher O'Brien","Graeme Fletcher",'43:08',null,'Patterdale → Hartsop'],["Keith Hood","Timothy Norwood",'1:30:08',null,'Hartsop → Kirkstone'],["Martyn Tunstall","Paul O'Brien",'1:10:56',null,'Kirkstone → Sykeside']]},
+ {y:2006,pos:35,cat:'Open',time:'4:54:38',legs:[["Moray Anderson","Steven O'Brien",'1:24:39',null,'Sykeside → Patterdale'],["Alexander Cumming","Calum McKenzie",'42:28',null,'Patterdale → Hartsop'],["David Law","Timothy Norwood",'1:33:05',null,'Hartsop → Kirkstone'],["Martyn Tunstall","Paul O'Brien",'1:14:26',null,'Kirkstone → Sykeside']]},
+ {y:2007,pos:63,cat:'Open',time:'6:16:45',legs:[["David Colman","Dean Carr",'1:41:24',null,'Sykeside → Kirkstone'],["Christopher O'Brien","Graeme Fletcher",'1:32:50',null,'Kirkstone → Hartsop'],["John O'Hara","Nick Brown",'57:52',null,'Hartsop → Patterdale'],["David Law","Martin Hulme",'2:04:39',null,'Patterdale → Sykeside']]},
+ {y:2008,none:'No record'},
+ {y:2009,pos:38,cat:'Open',time:'4:52:30',note:'Reverse course from Sykeside, via Pile of Stones and Red Screes first. Christopher O’Brien ran both leg 1 and leg 3.',
+  cps:['Sykeside','Pile of Stones','Red Screes','Kirkstone',"Raven's Crag",'Caudale Moor','High Street','The Knott','Hartsop','Path/Stream Jn','Angle Tarn','Patterdale','Thornhow End','St Sunday Crag','Hart Crag','Sykeside'],
+  sp:'38:43 32:59 8:25 6:22 17:44 32:12 8:18 13:55 6:37 16:54 18:01 12:49 28:33 27:19 23:39',
+  spPos:[47,44,39,14,39,46,29,35,14,19,12,47,46,41,43], cumPos:null, legEnds:[3,8,11,15],
+  legs:[["Christopher O'Brien","Peter Hubbard",'1:20:07',null],["Scott Pilkington","Tom Ferrington",'1:18:31',null],["Calum McKenzie","Christopher O'Brien",'41:32',null],["Alexander Cumming","Timothy Norwood",'1:32:20',null]], legCum:[44,47,35,38]},
+ {y:2010,pos:38,cat:'Open',time:'5:06:36',note:'Reverse course from Sykeside, via Red Screes first.',
+  cps:['Sykeside','Pile of Stones','Red Screes','Kirkstone',"Raven's Crag",'Caudale Moor','High Street','The Knott','Hartsop','Path/Stream Jn','Angle Tarn','Patterdale','Thornhow End','St Sunday Crag','Hart Crag','Sykeside'],
+  sp:'34:58 30:21 7:06 6:25 15:19 26:39 7:24 10:56 6:37 20:36 21:14 15:00 32:52 34:12 36:57',
+  spPos:[32,24,27,11,13,10,5,2,22,43,35,56,53,54,56], cumPos:null, legEnds:[3,8,11,15],
+  legs:[["Alexander Cumming","Timothy Norwood",'1:12:25',28],["Christopher O'Brien","Steven O'Brien",'1:06:43',7],["Nick Brown","Tom Ferrington",'48:27',36],["David Law","Paul O'Brien",'1:59:01',60]], legCum:[28,16,22,38]},
+ {y:2011,pos:33,cat:'Mixed',time:'4:54:27',note:'Leg 3 handed over at Brotherswater; no footbridge control.',
+  cps:['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Brotherswater','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  sp:'32:02 13:39 4:31 39:46 24:26 11:00 3:47 18:45 37:14 20:43 40:32 27:03 14:26 6:33',
+  spPos:null,cumPos:null,legEnds:[3,7,10,14],
+  legs:[["Corrie Roberts","Susan Johnston",'50:12',56],["Steven O'Brien","Tom Ferrington",'1:18:59',16],["Graeme Fletcher","Paul O'Brien",'1:16:42',44],["Alexander Cumming","Timothy Norwood",'1:28:34',null]], legCum:[56,25,37,33]},
+ {y:2012,pos:55,cat:'Mixed',time:'5:28:26',note:'52 minutes from St Sunday Crag to Thornhow End on leg 4.',
+  cps:['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Brotherswater','Footbridge','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  sp:'30:04 14:50 4:06 37:38 23:50 11:32 4:03 15:41 29:18 17:32 4:11 33:12 33:02 52:07 17:20',
+  spPos:null,cumPos:null,legEnds:[3,7,10,15],
+  legs:[["Fiona Drake","Susan Johnston",'49:00',40],["Kris Berry","Tom Ferrington",'1:17:03',21],["Graeme Fletcher","James Harrison",'1:02:31',23],["Christopher O'Brien","Steven O'Brien",'2:19:52',62]], legCum:[40,21,23,55]},
+ {y:2013,pos:55,cat:'Mixed',time:'5:43:56',note:'Footbridge control not recorded; that split is merged into Hart Crag.',
+  cps:['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Brotherswater','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  sp:'30:49 15:24 4:22 44:35 27:47 11:56 4:22 20:42 46:07 30:16 43:51 32:28 21:30 9:47',
+  spPos:null,cumPos:null,legEnds:[3,7,10,14],
+  legs:[["Fiona Drake","Susan Johnston",'50:35',54],["Alexander Cumming","Scott Williamson",'1:28:40',40],["David Law","Nick Brown",'1:37:05',61],["Ruth Gibson","Timothy Norwood",'1:47:36',55]], legCum:[54,40,61,55]},
+ {y:2014,pos:29,cat:'Open',time:'4:51:24',
+  cps:['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Brotherswater','Footbridge','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  sp:'36:00 14:12 4:22 39:20 23:46 10:39 3:30 15:04 37:03 20:27 3:58 33:47 27:59 15:00 6:17',
+  spPos:null,cumPos:null,legEnds:[3,7,10,15],
+  legs:[["Alan Cameron","Nick Brown",'54:34',53],["Alexander Cumming","Steven O'Brien",'1:17:15',18],["James Harrison","Timothy Norwood",'1:12:34',33],["Jon Carpenter","Tom Ferrington",'1:27:01',30]], legCum:[53,26,34,30]},
+ {y:2015,pos:26,cat:'Open',time:'4:27:05',
+  cps:['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Brotherswater','Footbridge','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  sp:'28:31 10:56 3:49 39:09 26:12 11:02 3:59 15:40 26:27 17:29 3:57 33:35 26:18 13:57 6:04',
+  spPos:[23,18,18,31,44,34,39,29,20,22,17,27,26,40,null], cumPos:[23,21,21,23,28,29,29,26,24,24,23,24,24,25,26], legEnds:[3,7,10,15],
+  legs:[["Bruce Malcolm","Graeme Fletcher",'43:16',21],["David Hall","James Harrison",'1:20:22',36],["Christopher O'Brien","Steven O'Brien",'59:36',22],["Tom Ferrington","Tom Wilson",'1:23:51',30]]},
+ {y:2016,pos:24,cat:'Open',time:'4:32:36', cps:CPS_2016,
+  sp:'28:49 11:54 3:56 39:54 24:33 12:15 4:09 17:07 29:09 18:50 3:52 34:10 25:51 12:24 5:43',
+  spPos:[22,22,23,33,30,41,34,41,29,30,11,26,21,25,null], cumPos:[22,17,17,24,24,25,25,25,25,23,22,26,24,23,24], legEnds:[3,7,10,15],
+  legs:[["Graeme Fletcher","Tom Ferrington",'44:39',17],["Doug Murray","Tom Wilson",'1:20:51',35],["Christopher O'Brien","Steven O'Brien",'1:05:06',30],["James Harrison","Julian Barrable",'1:22:00',24]]},
+ {y:2017,pos:30,cat:'Open',time:'3:28:23',note:'Shortened course due to bad weather: out and back over Caudale Moor via Threshthwaite Mouth.',
+  cps:['Patterdale','Angle Tarn','Pump House','Hartsop','Threshthwaite Mouth','Caudale Moor',"Raven's Crag",'Kirkstone',"Raven's Crag",'Caudale Moor','Threshthwaite Mouth','Hartsop','Pump House','Angle Tarn','Patterdale'],
+  sp:'27:15 11:03 3:42 26:28 12:25 17:57 5:47 6:58 17:34 12:04 20:53 6:31 16:46 23:00',
+  spPos:[13,18,10,22,29,64,61,46,37,38,47,8,27,35], cumPos:[13,12,11,17,20,28,34,34,31,32,33,32,32,30], legEnds:[3,7,11,14],
+  legs:[["Tom Ferrington","Tom Wilson",'42:00',11],["Christopher O'Brien","James Harrison",'1:02:37',50],["Doug Murray","Steven O'Brien",'57:29',41],["David Hall","Jon Carpenter",'46:17',null]]},
+ {y:2018,pos:40,cat:'Open',time:'4:47:58',note:'1:17:35 behind the winners.',
+  cps:['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Sykeside','Footbridge','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  sp:'30:51 21:44 4:45 36:06 34:34 10:21 3:47 16:42 28:43 19:31 4:12 32:48 25:37 12:29 5:48',
+  spPos:[32,69,56,7,63,15,28,36,31,36,26,24,34,29,31], cumPos:[32,63,63,41,52,50,48,45,43,40,39,39,41,40,40], legEnds:[3,7,10,15],
+  legs:[["Anne Ewing","Tom Wilson",'57:20',63],["James Harrison","Tom Ferrington",'1:24:48',35],["Donald Macauly","Julian Barrable",'1:04:56',33],["Christopher O'Brien","Duncan Birse",'1:20:54',31]]},
+ {y:2019,none:'Entry missed'},
+ {y:2020,none:'No race: COVID-19'},
+ {y:2021,pos:22,cat:'Open',time:'4:37:06',note:'Dreich, very wet and windy. 58:03 behind the winners.', cps:CPS_2016,
+  sp:'29:04 11:56 3:57 39:11 24:38 11:04 3:48 16:05 30:22 22:11 4:10 31:22 27:14 14:41 7:23',
+  spPos:[17,26,17,17,17,15,14,22,31,37,15,16,30,44,56], cumPos:[17,22,22,16,15,13,13,13,17,20,20,19,19,21,22], legEnds:[3,7,10,15],
+  legs:[["Christopher O'Brien","Ross Milne",'44:57',22,17,22,'Captain: COB held Ross back a bit on the up, pace to burn on the downs. Ross good consistent pace on the up, slower on the descents.'],["Julian Barrable","Tom Ferrington",'1:18:41',15,17,17],["Al Simpson","David Hall",'1:08:38',31,22,37],["Aaron Hoyle","James Dunn",'1:24:50',27,16,45]]},
+ {y:2022,pos:13,cat:'Mixed',time:'4:13:45',note:'Club best finish and fastest time. 39:22 behind the winners.', cps:CPS_2016,
+  sp:'30:19 13:18 3:49 34:44 22:24 10:21 3:28 15:14 25:46 17:28 3:57 30:50 24:16 12:18 5:33',
+  spPos:[34,43,20,10,12,11,15,14,13,15,15,15,15,29,22], cumPos:[34,37,37,21,17,16,16,16,14,13,13,12,13,13,13], legEnds:[3,7,10,15],
+  legs:[["Kirsten Maxwell","Sophie Collins",'47:26',37,34,43],["Julian Barrable","Aaron Hoyle",'1:10:57',11,10,11],["Christopher O'Brien","Tom Ferrington",'58:28',14,14,15],["Ewan Brown","Duncan Birse",'1:16:54',18,15,29]]},
+ {y:2023,pos:21,cat:'Mixed',time:'4:30:34',note:'51:49 behind the winners.', cps:CPS_2016,
+  sp:'30:15 11:55 3:55 37:25 24:53 11:21 3:52 16:41 28:54 19:26 3:52 32:43 26:03 13:32 5:47',
+  spPos:[28,28,19,17,26,29,22,38,28,35,13,29,36,46,41], cumPos:[28,29,29,20,16,16,17,21,20,22,21,21,21,21,21], legEnds:[3,7,10,15],
+  legs:[["Sophie Collins","James Dunn",'46:05',29,28,19],["Tom Ferrington","Aaron Hoyle",'1:17:31',21,17,29],["Christopher O'Brien","Steven O'Brien",'1:05:01',34,39,35],["Julian Barrable","Jack Fullerton",'1:21:57',36,29,46]]},
+ {y:2024,pos:18,cat:'Open',time:'4:16:00',note:'43:35 behind the winners. Leg 3 ran the 4th-fastest split in the field. Footbridge taken before Hartsop Hall this year.',
+  cps:['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Footbridge','Hartsop Hall','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  sp:'32:10 12:20 3:56 36:47 22:32 10:09 3:46 12:25 21:30 12:08 3:14 37:04 28:00 14:19 5:40',
+  spPos:[46,39,25,13,13,7,32,2,2,7,2,40,43,41,33], cumPos:[46,43,43,29,23,22,22,19,9,9,9,12,16,16,18], legEnds:[3,7,11,15],
+  legs:[["Christopher O'Brien","Steven O'Brien",'48:26',43,46,39],["Julian Barrable","James Dunn",'1:13:14',9,13,7],["Ewan Brown","Fearghas Thomson",'49:17',4],["Jack Fullerton","Jack Eykelbosh",'1:25:03',41]]},
+ {y:2025,none:'Cancelled: storm'}
+];
+</script>
+<script>
+(() => {
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const T = s => { const p = s.split(':').map(Number); return p.length === 3 ? p[0]*3600+p[1]*60+p[2] : p[0]*60+p[1]; };
+const fmt = (sec, h) => { sec = Math.max(0, Math.round(sec)); const H = Math.floor(sec/3600), M = Math.floor(sec%3600/60), S = sec%60; return (H||h) ? `${H}:${String(M).padStart(2,'0')}:${String(S).padStart(2,'0')}` : `${M}:${String(S).padStart(2,'0')}`; };
+const fmtL = s => fmt(s, s >= 3600);
+const ord = n => n == null ? '—' : n + (['th','st','nd','rd'][((n%100-20)%10>3||n%100<14&&n%100>10)?0:Math.min(n%10,4)%4] || 'th');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const surname = n => n.split(' ').slice(1).join(' ');
+const pairName = (a, b) => `${a[0]}. ${surname(a)} & ${b[0]}. ${surname(b)}`;
+const posCls = p => p == null ? '' : p <= 10 ? 'p1' : p <= 25 ? 'p2' : p <= 45 ? 'p3' : 'p4';
+const chip = p => p == null ? '' : `<span class="chip ${posCls(p)}">${p}</span>`;
+const avg = a => a.reduce((s, x) => s + x, 0) / a.length;
+const HEAT = {good:[47,158,91], mid:[232,197,71], bad:[210,69,47]};
+function heatRGB(t) { t = Math.max(0, Math.min(1, t)); const [a, b, u] = t < 0.5 ? [HEAT.good, HEAT.mid, t*2] : [HEAT.mid, HEAT.bad, (t-0.5)*2]; return a.map((x, i) => Math.round(x + (b[i]-x)*u)); }
+const posT = p => (p - 1) / 59, pctT = f => f / 0.35;
+const heatBg = t => t == null ? '' : `background:rgba(${heatRGB(t).join(',')},.55)`;
+const SHORT = {'Path/Stream Jn':'Path/stream','Caudale Moor':'Caudale','St Sunday Crag':'St Sunday','Threshthwaite Mouth':'Threshthwaite','Thornhow End':'Thornhow',"Raven's Crag":"Raven's"};
+const sh = n => SHORT[n] || n;
+const smooth = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+
+/* ---------- route sections ---------- */
+const ROUTE_CPS = {
+  'Sykeside → Patterdale':['Sykeside','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'],
+  'Patterdale → Hartsop':['Patterdale','Angle Tarn','Path/Stream Jn','Hartsop'],
+  'Hartsop → Kirkstone':['Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone'],
+  'Kirkstone → Sykeside':['Kirkstone','Red Screes','Pile of Stones','Sykeside'],
+  'Sykeside → Kirkstone':['Sykeside','Pile of Stones','Red Screes','Kirkstone'],
+  'Kirkstone → Hartsop':['Kirkstone',"Raven's Crag",'Caudale Moor','High Street','The Knott','Hartsop'],
+  'Hartsop → Patterdale':['Hartsop','Path/Stream Jn','Angle Tarn','Patterdale'],
+  'Patterdale → Sykeside':['Patterdale','Thornhow End','St Sunday Crag','Hart Crag','Sykeside']
+};
+const NORM = x => (x === 'Sykeside' || x === 'Brotherswater' || x === 'Hartsop Hall') ? 'BW' : x;
+const SECTIONS = [
+  {id:1, name:'Patterdale – Hartsop', via:'Angle Tarn', a:'Patterdale', b:'Hartsop', meta:'6.7 km · 440 m'},
+  {id:2, name:'Hartsop – Kirkstone', via:'High Street and Caudale Moor', a:'Hartsop', b:'Kirkstone', meta:'11 km · 890 m'},
+  {id:3, name:'Kirkstone – Hartsop Hall', via:'Red Screes and Dove Crag', a:'Kirkstone', b:'BW', meta:'7.5 km · 570 m'},
+  {id:4, name:'Hartsop Hall – Patterdale', via:'Hart Crag and St Sunday Crag', a:'BW', b:'Patterdale', meta:'11 km · 900 m'}
+];
+
+/* ---------- process races into runs ---------- */
+const RUNS = [], SPLIT = [], RACED = [];
+for (const r of RACES) {
+  if (r.none) continue;
+  RACED.push(r);
+  r.total = T(r.time);
+  if (r.cps) {
+    r.split = r.sp.trim().split(/\s+/).map(T);
+    r.cum = [0]; r.split.forEach(s => r.cum.push(r.cum[r.cum.length-1] + s));
+    SPLIT.push(r);
+  }
+  r.runs = r.legs.map((l, i) => {
+    let cps, splits = null, spPos = null, up = null, down = null, note = null, endCum = null;
+    if (r.cps) {
+      const i0 = i ? r.legEnds[i-1] : 0, i1 = r.legEnds[i];
+      cps = r.cps.slice(i0, i1+1); splits = r.split.slice(i0, i1); spPos = r.spPos ? r.spPos.slice(i0, i1) : null;
+      up = l[4]; down = l[5]; note = l[6];
+      endCum = r.cumPos ? r.cumPos[i1-1] : (r.legCum ? r.legCum[i] : null);
+    } else cps = ROUTE_CPS[l[4]];
+    const f = NORM(cps[0]), t = NORM(cps[cps.length-1]);
+    const s = SECTIONS.find(s => (s.a === f && s.b === t) || (s.a === t && s.b === f));
+    const run = { race:r, year:r.y, n:i+1, a:l[0], b:l[1], time:T(l[2]), pos:l[3], up, down, note, cps, splits, spPos, endCum,
+      sec: s ? s.id : null, dir: s && s.a === f ? 'fwd' : 'rev', short: r.y === 2017, id:`${r.y}-L${i+1}` };
+    RUNS.push(run); return run;
+  });
+  // whole-course checkpoint list (for drawing)
+  if (r.cps) { r.course = r.cps; r.courseEnds = r.legEnds; }
+  else { r.course = [r.runs[0].cps[0]]; r.courseEnds = []; r.runs.forEach(run => { r.course.push(...run.cps.slice(1)); r.courseEnds.push(r.course.length-1); }); }
+}
+SPLIT.sort((a, b) => b.y - a.y);
+const byYear = Object.fromEntries(RACES.map(r => [r.y, r]));
+const runOf = (y, n) => byYear[y].runs[n-1];
+const secTag = run => run.short ? 'short course' : (run.sec !== run.n || run.dir === 'rev') ? `today's Leg ${run.sec} route${run.dir === 'rev' ? ', reversed' : ''}` : '';
+
+/* ---------- split classification: U uphill, D downhill, M mixed, X short transition ---------- */
+const CLS = {
+  'Patterdale|Angle Tarn':'U','Angle Tarn|Path/Stream Jn':'D','Path/Stream Jn|Hartsop':'D','Angle Tarn|Pump House':'D','Pump House|Hartsop':'D',
+  'Hartsop|High Street':'U','High Street|Caudale Moor':'M',"Caudale Moor|Raven's Crag":'D',"Raven's Crag|Kirkstone":'D',
+  'Kirkstone|Red Screes':'U','Red Screes|Pile of Stones':'M','Pile of Stones|Footbridge':'D','Pile of Stones|Hartsop Hall':'D','Pile of Stones|Brotherswater':'D',
+  'Footbridge|Hartsop Hall':'X','Brotherswater|Footbridge':'X','Hartsop Hall|Brotherswater':'X',
+  'Footbridge|Hart Crag':'U','Brotherswater|Hart Crag':'U','Hartsop Hall|Hart Crag':'U','Hart Crag|St Sunday Crag':'M','St Sunday Crag|Thornhow End':'D','Thornhow End|Patterdale':'D',
+  'High Street|The Knott':'D','The Knott|Hartsop':'D','Hartsop|Threshthwaite Mouth':'U','Threshthwaite Mouth|Caudale Moor':'U'
+};
+const ALIAS = {'Sykeside':'Brotherswater'};
+const key = n => ALIAS[n] || n;
+const flip = c => c === 'U' ? 'D' : c === 'D' ? 'U' : c;
+function cls(a, b) { const A = key(a), B = key(b); return CLS[A+'|'+B] || (CLS[B+'|'+A] ? flip(CLS[B+'|'+A]) : 'M'); }
+const GLYPH = {U:'▲', D:'▼', M:'◆', X:'·'};
+const CLSNAME = {U:'uphill', D:'downhill', M:'mixed', X:'short link'};
+const glyph = c => `<span class="g c-${c}" title="${CLSNAME[c]}">${GLYPH[c]}</span>`;
+
+/* ---------- geography ---------- */
+const CP = {'Patterdale':[390,160],'Angle Tarn':[417,145],'Path/Stream Jn':[421,131],'Hartsop':[411,130],'High Street':[441,111],'Caudale Moor':[415,101],"Raven's Crag":[405,82],'Kirkstone':[401,82],'Red Screes':[396,87],'Pile of Stones':[372,109],'Footbridge':[389,114],'Hartsop Hall':[397,118],'Brotherswater':[403,119],'Hart Crag':[367,112],'St Sunday Crag':[368,134],'Thornhow End':[384,152],'The Knott':[437,127],'Pump House':[422,130],'Threshthwaite Mouth':[426,100]};
+const SEG = {};
+const S = (a, b, p) => SEG[a+'|'+b] = p;
+S('Patterdale','Angle Tarn',[[390,160],[396,160],[402,158],[408,157],[411,153],[414,149],[417,145]]);
+S('Angle Tarn','Path/Stream Jn',[[417,145],[419,141],[422,137],[422,134],[421,131]]);
+S('Path/Stream Jn','Hartsop',[[421,131],[417,130.5],[414,130],[411,130]]);
+S('Angle Tarn','Pump House',[[417,145],[419,141],[422,137],[422,133],[422,130]]);
+S('Pump House','Hartsop',[[422,130],[418,130],[414,130],[411,130]]);
+S('Hartsop','High Street',[[411,130],[416,129],[421,128],[426,128],[430,128.4],[434,127.4],[438,124],[440.5,120],[441,115.5],[441,111]]);
+S('High Street','Caudale Moor',[[441,111],[439,106],[435,102],[431,100],[426,100],[421,100.5],[415,101]]);
+S('Caudale Moor',"Raven's Crag",[[415,101],[414,97],[412,93],[409,88],[407,85],[405,82]]);
+S("Raven's Crag",'Kirkstone',[[405,82],[403,81.5],[401,82]]);
+S('Kirkstone','Red Screes',[[401,82],[399,84],[397.5,85.8],[396,87]]);
+S('Red Screes','Pile of Stones',[[396,87],[394,91],[391,94],[388,96],[386,99],[382,101],[378,103],[375,105],[373,107],[372,109]]);
+S('Pile of Stones','Footbridge',[[372,109],[376,110],[380,110.5],[384,112],[387,113],[389,114]]);
+S('Footbridge','Hartsop Hall',[[389,114],[392,115.5],[395,117],[397,118]]);
+S('Hartsop Hall','Brotherswater',[[397,118],[400,118.5],[403,119]]);
+S('Footbridge','Hart Crag',[[389,114],[387,116],[385,118.5],[383,120],[380,119],[377,117],[374,115],[370,113],[367,112]]);
+S('Hart Crag','St Sunday Crag',[[367,112],[363,115],[360,118],[359,121],[360,124],[361,127],[364,130],[368,134]]);
+S('St Sunday Crag','Thornhow End',[[368,134],[372,137],[376,140],[380,144],[382,148],[384,152]]);
+S('Thornhow End','Patterdale',[[384,152],[386,155],[388,158],[390,160]]);
+S('High Street','The Knott',[[441,111],[441,115.5],[440.5,120],[439,123.5],[437,127]]);
+S('The Knott','Hartsop',[[437,127],[434,127.4],[430,128.4],[426,128],[421,128],[416,129],[411,130]]);
+S('Hartsop','Threshthwaite Mouth',[[411,130],[415,127],[418,123],[420.5,118],[422,112],[423.5,107],[425,103],[426,100]]);
+S('Threshthwaite Mouth','Caudale Moor',[[426,100],[421,100.5],[415,101]]);
+const direct = (a, b) => SEG[a+'|'+b] || (SEG[b+'|'+a] ? SEG[b+'|'+a].slice().reverse() : null);
+function chain(a, b, via) { const p1 = direct(a, via), p2 = direct(via, b); return p1 && p2 ? p1.concat(p2.slice(1)) : null; }
+function segPts(a, b) {
+  a = key(a); b = key(b);
+  return direct(a, b) || chain(a, b, 'Footbridge') || chain(a, b, 'Hartsop Hall') ||
+    (() => { const p = chain(a, 'Hartsop Hall', 'Footbridge'); const q = direct('Hartsop Hall', b); return p && q ? p.concat(q.slice(1)) : null; })() ||
+    (() => { const p = direct(a, 'Hartsop Hall'); const q = chain('Hartsop Hall', b, 'Footbridge'); return p && q ? p.concat(q.slice(1)) : null; })() ||
+    [CP[a], CP[b]];
+}
+
+/* ---------- terrain: spot heights (E, N in 100 m NY units, metres) ---------- */
+const SPOTS = [
+ [405,170,657],[408,157,390],[413,148,567],[415,146,520],[417.3,144.5,476],[420,140,560],[418,137,561],[424,137,590],[432,137,696],[433,130,620],[437,126,739],[443,128,792],[447,126,780],[448,134,802],[441,121,760],[441,116,800],[441,110,828],[440,105,790],[436,103,780],[448,101,760],[431,100,784],[429,108,680],[427,117,699],[425,123,560],
+ [431,125,416],[431.5,123.5,416],[430.5,126.5,418],[425,128,350],[421,131,310],[416,130,215],[410,130,175],[409,133,170],[404,128.5,153],[403.5,126.5,153],[402.5,130,153],[404.5,131,156],
+ [411,118,618],[413,112,650],[409,124,320],[415,122,420],[421,118,230],[423,107,420],[426,100,590],[418,100,763],[415,101,740],[413,92,680],[411,103,560],[407,106,380],[403,112,195],[404,115,175],[403,120,160],[403,105,265],[402,95,360],[402,88,420],[401,81,454],[405,84,592],[405,82,545],[400,75,400],[408,74,380],[412,80,450],[418,68,230],[415,80,380],[422,90,520],[435,85,720],[437,77,757],[438,67,706],[446,80,380],[440,95,560],[448,90,600],
+ [396,87,776],[399,87,600],[397,92,720],[397,96,654],[398,103,450],[388,96,515],[385,92,470],[387,100,637],[393,107,519],[396,112,300],[381,101,640],[378,103,710],[374,104,792],[374,108,720],[372,109,765],[379,110,500],[384,112,330],[389,114,230],[392,116,200],[397,118,165],[400,121,158],[392,120,320],[386,118,440],[383,120,586],[380,118,660],[375,116,760],[371,118,620],
+ [374,88,656],[373,78,508],[383,85,350],[385,75,250],[391,76,640],[392,68,350],[365,90,280],[362,98,420],[356,104,766],[355,95,650],[356,83,612],[355,72,450],[364,66,120],[380,66,140],[395,66,250],[405,66,280],[430,66,280],[446,66,380],
+ [368,112,822],[359,117,873],[356,112,780],[362,118,840],[368,121,700],[359,121,820],[361,127,670],[369,134,841],[373,134,784],[365,131,780],[362,133,620],[356,125,700],[357,140,540],[356,150,750],[378,125,330],[386,130,230],[392,137,175],[398,143,158],[396,150,155],[401,146,156],[403,138,156],[407,140,300],[405,148,240],[400,158,180],
+ [380,144,622],[386,147,450],[394,150,433],[397,154,200],[384,152,330],[376,140,560],[372,140,420],[365,142,300],[375,150,230],[381,156,180],[386,158,155],[390,160,150],[364,160,718],[372,160,560],[384,163,290],[386,166,165],
+ [393,170,141],[397,172,140],[391,173,140],[401,176,140],[388,171,142],[386,169,150],[380,175,442],[372,176,560],[358,175,620],[358,165,720],[410,176,350],[418,164,320],[421,169,300],[428,171,509],[430,160,330],[434,152,576],[438,145,560],[440,140,420],[446,145,670],[446,158,560],[446,172,420],[436,176,330],
+ [356,66,150],[447,110,700],[447,118,710]
+];
+const E0 = 335400, N0 = 506200, STEP = 40, NX = 236, NY = 290;
+const W = (NX-1)*STEP/1000, D = (NY-1)*STEP/1000;
+const toE = v => 300000 + v*100, toN = v => 500000 + v*100;
+function solve(A, n) {
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c+1; r < n; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+    [A[c], A[p]] = [A[p], A[c]];
+    const piv = A[c][c];
+    for (let r = c+1; r < n; r++) { const f = A[r][c]/piv; if (!f) continue; const Ar = A[r], Ac = A[c]; for (let k = c; k <= n; k++) Ar[k] -= f*Ac[k]; }
+  }
+  const x = new Float64Array(n);
+  for (let r = n-1; r >= 0; r--) { let s = A[r][n]; for (let k = r+1; k < n; k++) s -= A[r][k]*x[k]; x[r] = s/A[r][r]; }
+  return x;
+}
+const phi = r => r > 0 ? r*r*Math.log(r) : 0;
+function tpsGrid() {
+  const pts = SPOTS.map(([e, n, h]) => [(toE(e)-E0)/1000, (toN(n)-N0)/1000, h]);
+  const n = pts.length, m = n+3, mean = pts.reduce((s, p) => s+p[2], 0)/n, lam = 0.02;
+  const A = Array.from({length:m}, () => new Float64Array(m+1));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) A[i][j] = phi(Math.hypot(pts[i][0]-pts[j][0], pts[i][1]-pts[j][1]));
+    A[i][i] += lam; A[i][n] = 1; A[i][n+1] = pts[i][0]; A[i][n+2] = pts[i][1]; A[i][m] = pts[i][2]-mean;
+    A[n][i] = 1; A[n+1][i] = pts[i][0]; A[n+2][i] = pts[i][1];
+  }
+  const w = solve(A, m);
+  const g = new Float32Array(NX*NY);
+  for (let j = 0; j < NY; j++) { const y = j*STEP/1000; for (let i = 0; i < NX; i++) { const x = i*STEP/1000;
+    let s = w[n] + w[n+1]*x + w[n+2]*y; for (let k = 0; k < n; k++) s += w[k]*phi(Math.hypot(x-pts[k][0], y-pts[k][1]));
+    g[j*NX+i] = Math.max(138, s+mean); } }
+  return g;
+}
+let HG = tpsGrid();
+const TPS = HG.slice();
+let terrainSrc = 'model';
+function Hat(E, N) {
+  const fx = Math.min(NX-1.001, Math.max(0, (E-E0)/STEP)), fy = Math.min(NY-1.001, Math.max(0, (N-N0)/STEP));
+  const i = Math.floor(fx), j = Math.floor(fy), tx = fx-i, ty = fy-j;
+  const a = HG[j*NX+i], b = HG[j*NX+i+1], c = HG[(j+1)*NX+i], d = HG[(j+1)*NX+i+1];
+  return a*(1-tx)*(1-ty) + b*tx*(1-ty) + c*(1-tx)*ty + d*tx*ty;
+}
+
+/* ---------- tracks (cached per checkpoint list) ---------- */
+function buildTrack(cps) {
+  const pts = [], cpIdx = [0];
+  for (let k = 0; k < cps.length-1; k++) {
+    const seg = segPts(cps[k], cps[k+1]).map(([e, n]) => [toE(e), toN(n)]);
+    for (let s = 0; s < seg.length-1; s++) {
+      const [e1, n1] = seg[s], [e2, n2] = seg[s+1], d = Math.hypot(e2-e1, n2-n1), steps = Math.max(1, Math.ceil(d/20));
+      for (let q = (pts.length ? 1 : 0); q <= steps; q++) pts.push({E:e1+(e2-e1)*q/steps, N:n1+(n2-n1)*q/steps});
+    }
+    cpIdx.push(pts.length-1);
+  }
+  const tr = {pts, cpIdx, cps}; heightTrack(tr); return tr;
+}
+function heightTrack(tr) {
+  let dist = 0, eff = 0, asc = 0;
+  tr.pts.forEach((p, i) => {
+    p.h = Hat(p.E, p.N);
+    if (i) { const q = tr.pts[i-1], d = Math.hypot(p.E-q.E, p.N-q.N), up = Math.max(0, p.h-q.h); dist += d; asc += up; eff += d + 8*up; }
+    p.d = dist; p.eff = eff; p.asc = asc;
+  });
+}
+const tracks = {};
+const trackFor = cps => { const k = cps.join('>'); return tracks[k] || (tracks[k] = buildTrack(cps)); };
+const routeKey = cps => cps.map(key).join('>');
+const segSet = cps => { const s = new Set(); for (let i = 0; i < cps.length-1; i++) s.add([NORM(cps[i]), NORM(cps[i+1])].sort().join('|') + (NORM(cps[i]) === NORM(cps[i+1]) ? '' : '')); return s; };
+function pointAtEff(tr, e) {
+  const P = tr.pts; let lo = 0, hi = P.length-1;
+  while (hi-lo > 1) { const mid = (lo+hi) >> 1; if (P[mid].eff <= e) lo = mid; else hi = mid; }
+  const a = P[lo], b = P[hi], f = b.eff > a.eff ? (e-a.eff)/(b.eff-a.eff) : 0;
+  return {E:a.E+(b.E-a.E)*f, N:a.N+(b.N-a.N)*f, h:a.h+(b.h-a.h)*f, d:a.d+(b.d-a.d)*f};
+}
+
+/* ---------- entries ---------- */
+const COLORS = ['--s1','--s2','--s3','--s4','--s5','--s6'];
+let entries = [];
+function entryFromRun(run) {
+  const tr = trackFor(run.cps); let cum;
+  if (run.splits) { cum = [0]; run.splits.forEach(s => cum.push(cum[cum.length-1] + s)); }
+  else { const E = tr.pts[tr.cpIdx[tr.cpIdx.length-1]].eff; cum = tr.cpIdx.map(i => run.time * tr.pts[i].eff / E); }
+  const tag = secTag(run);
+  return { id:run.id, src:run, run, year:run.year, cps:run.cps, splits:run.splits, spPos:run.spPos, cumPos:null, cum, total:run.time, est:!run.splits, track:tr,
+    routeKey:routeKey(run.cps), title:`${run.year} · Leg ${run.n} · ${pairName(run.a, run.b)}`,
+    sub:`${sh(run.cps[0])} → ${sh(run.cps[run.cps.length-1])}${tag ? ' · ' + tag : ''}${run.pos ? ' · ' + ord(run.pos) + ' on leg' : ''}${run.splits ? '' : ' · leg time only'}`,
+    short:`${run.year} L${run.n} ${pairName(run.a, run.b)}`, tag:`’${String(run.year).slice(2)} L${run.n}` };
+}
+function entryFromTeam(y) {
+  const r = byYear[y], tr = trackFor(r.cps);
+  return { id:`${y}-T`, src:y, team:true, year:y, race:r, cps:r.cps, splits:r.split, spPos:r.spPos, cumPos:r.cumPos, cum:r.cum.slice(), total:r.total, est:false, track:tr,
+    routeKey:routeKey(r.cps), title:`${y} · Whole team`, sub:`${ord(r.pos)} overall · ${r.cat}`, short:`${y} team`, tag:`’${String(y).slice(2)} Team` };
+}
+const mk = src => typeof src === 'number' ? entryFromTeam(src) : entryFromRun(src);
+function freeColor() { const used = entries.map(e => e.colorVar); return COLORS.find(c => !used.includes(c)) || COLORS[entries.length % 6]; }
+function setEntries(srcs) {
+  entries = [];
+  for (const s of srcs) { if (!s || entries.length >= 6) continue; const e = mk(s); if (!entries.find(x => x.id === e.id)) { e.colorVar = freeColor(); entries.push(e); } }
+  state.t = 0; state.playing = false; onEntriesChanged();
+}
+function addEntry(src) {
+  const e = mk(src); if (entries.find(x => x.id === e.id)) return;
+  if (entries.length >= 6) entries.shift();
+  e.colorVar = freeColor(); entries.push(e); state.t = 0; onEntriesChanged();
+}
+const state = { t:0, playing:false, speed:180, last:0 };
+const maxT = () => Math.max(60, ...entries.map(e => e.total));
+function entryPos(e, t) {
+  const tr = e.track, last = e.cum.length-1;
+  if (t >= e.total) { const p = tr.pts[tr.cpIdx[last]]; return {...p, done:true, k:last}; }
+  let k = 0; while (k < last-1 && e.cum[k+1] <= t) k++;
+  const f = (t - e.cum[k]) / (e.cum[k+1] - e.cum[k]);
+  const ea = tr.pts[tr.cpIdx[k]].eff, eb = tr.pts[tr.cpIdx[k+1]].eff;
+  return {...pointAtEff(tr, ea + f*(eb-ea)), done:false, k};
+}
+
+/* ---------- header stats ---------- */
+(function stats() {
+  const best = RACED.reduce((a, b) => a.pos <= b.pos ? a : b);
+  const fast = RACED.filter(r => r.y !== 2017).reduce((a, b) => a.total <= b.total ? a : b);
+  const names = new Set(); RUNS.forEach(l => { names.add(l.a); names.add(l.b); });
+  const race = new Date('2026-10-03T09:30:00+01:00'), days = Math.ceil((race - new Date())/864e5);
+  const nxt = days > 0 ? `${days} day${days>1?'s':''} to go` : days === 0 ? 'Today' : 'Results pending';
+  $('#stats').innerHTML = [
+    [RACED.length, 'relays started since 2000'],
+    [ord(best.pos), `best finish (${best.y}, mixed)`],
+    [fmt(fast.total, true), `fastest full course (${fast.y})`],
+    [names.size, 'different runners'],
+    ['Sat 3 Oct', `2026 race, 9:30 Patterdale · ${nxt}`]
+  ].map(([b, s]) => `<div class="stat"><b class="num">${b}</b><span>${s}</span></div>`).join('');
+})();
+
+/* ---------- three.js scene ---------- */
+const box = $('#mapbox');
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+box.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(42, 1, 0.05, 200);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = 1.38; controls.minDistance = 1.2; controls.maxDistance = 30;
+function resetView() { camera.position.set(1.5, 9.5, 10.5); controls.target.set(0.4, 0.3, 0.4); controls.update(); }
+resetView();
+let EX = 1.5;
+const wx = E => (E-E0)/1000 - W/2, wz = N => -((N-N0)/1000 - D/2), wy = h => h*EX/1000;
+
+const tGeo = new THREE.BufferGeometry();
+const tPos = new Float32Array(NX*NY*3), tH = new Float32Array(NX*NY);
+for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) { const k = j*NX+i; tPos[k*3] = i*STEP/1000 - W/2; tPos[k*3+2] = -(j*STEP/1000 - D/2); }
+const idx = new Uint32Array((NX-1)*(NY-1)*6); let q = 0;
+for (let j = 0; j < NY-1; j++) for (let i = 0; i < NX-1; i++) { const a = j*NX+i, b = a+1, c = a+NX, d = c+1; idx.set([a, c, b, b, c, d], q); q += 6; }
+tGeo.setAttribute('position', new THREE.BufferAttribute(tPos, 3));
+tGeo.setAttribute('aH', new THREE.BufferAttribute(tH, 1));
+tGeo.setIndex(new THREE.BufferAttribute(idx, 1));
+const tMat = new THREE.ShaderMaterial({
+  extensions:{derivatives:true},
+  uniforms:{ uL:{value:new THREE.Vector3(-0.9, 1.25, -0.75).normalize()} },
+  vertexShader:`attribute float aH; varying float vH; varying vec3 vN; void main(){ vH=aH; vN=normal; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`varying float vH; varying vec3 vN; uniform vec3 uL;
+    vec3 ramp(float h){
+      vec3 c0=vec3(.45,.60,.36), c1=vec3(.58,.65,.40), c2=vec3(.70,.64,.44), c3=vec3(.62,.56,.46), c4=vec3(.58,.57,.55), c5=vec3(.83,.82,.80);
+      if(h<250.) return mix(c0,c1,smoothstep(140.,250.,h));
+      if(h<420.) return mix(c1,c2,smoothstep(250.,420.,h));
+      if(h<600.) return mix(c2,c3,smoothstep(420.,600.,h));
+      if(h<760.) return mix(c3,c4,smoothstep(600.,760.,h));
+      return mix(c4,c5,smoothstep(760.,920.,h));
+    }
+    void main(){
+      vec3 n=normalize(vN); float dif=max(dot(n,uL),0.0);
+      vec3 col=ramp(vH)*(0.42+0.72*dif);
+      float f=vH/50.0; float w=fwidth(f); float ln=1.0-smoothstep(0.0,w*1.2,abs(fract(f-0.5)-0.5));
+      float f2=vH/250.0; float w2=fwidth(f2); float ln2=1.0-smoothstep(0.0,w2*2.0,abs(fract(f2-0.5)-0.5));
+      col=mix(col,vec3(.55,.30,.14),ln*0.28+ln2*0.45);
+      gl_FragColor=vec4(col,1.0);
+    }`
+});
+scene.add(new THREE.Mesh(tGeo, tMat));
+const WATER = [
+  {h:145, p:[[383,175.5],[386,172],[390,170],[394,169.5],[397,170.5],[400,172.5],[403,175],[405,177],[383,177]]},
+  {h:158, p:[[401.8,130.8],[403.5,131.6],[405,130.6],[405.6,128.2],[404.8,126],[403.2,125.6],[402,127.2],[401.6,129.2]]},
+  {h:422, p:[[429.6,127.2],[431.2,127.6],[432.4,125.6],[432.2,123.2],[431,122.6],[429.8,124.4]]},
+  {h:480, p:[[416.4,145.3],[417.6,145.5],[418.4,144.4],[417.9,143.6],[416.7,143.7],[416.2,144.6]]}
+];
+const waterMat = new THREE.MeshBasicMaterial({color:0x5B86A6, transparent:true, opacity:0.92});
+const waterMeshes = WATER.map(w => {
+  const shp = new THREE.Shape(w.p.map(([e, n]) => new THREE.Vector2(wx(toE(e)), -wz(toN(n)))));
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(shp), waterMat); m.rotation.x = -Math.PI/2; scene.add(m); m.userData.h = w.h; return m;
+});
+const routeGroup = new THREE.Group(); scene.add(routeGroup);
+const dotGroup = new THREE.Group(); scene.add(dotGroup);
+let cpLabels = [], dotObjs = [];
+
+function updateTerrainGeometry() {
+  for (let k = 0; k < NX*NY; k++) { tH[k] = HG[k]; tPos[k*3+1] = HG[k]*EX/1000; }
+  tGeo.attributes.position.needsUpdate = true; tGeo.attributes.aH.needsUpdate = true;
+  tGeo.computeVertexNormals(); tGeo.computeBoundingSphere();
+  waterMeshes.forEach(m => m.position.y = m.userData.h*EX/1000 + 0.004);
+}
+function tube(points, color, radius) {
+  const v = points.map(p => new THREE.Vector3(wx(p.E), wy(p.h) + 0.012, wz(p.N)));
+  const curve = new THREE.CatmullRomCurve3(v, false, 'centripetal');
+  return new THREE.Mesh(new THREE.TubeGeometry(curve, Math.min(1600, v.length*2), radius, 6, false), new THREE.MeshBasicMaterial({color}));
+}
+const thin = (pts, n) => { const s = Math.max(1, Math.floor(pts.length/n)); const o = pts.filter((_, i) => i % s === 0); if (o[o.length-1] !== pts[pts.length-1]) o.push(pts[pts.length-1]); return o; };
+let mapYear = 2024;
+function buildRoutes() {
+  routeGroup.children.slice().forEach(c => { routeGroup.remove(c); c.geometry && c.geometry.dispose(); });
+  cpLabels.forEach(l => l.el.remove()); cpLabels = [];
+  const r = byYear[mapYear], tr = trackFor(r.course);
+  const heatOn = $('#heatRoute').checked && r.spPos;
+  if (heatOn) {
+    for (let k = 0; k < r.course.length-1; k++) {
+      const seg = tr.pts.slice(tr.cpIdx[k], tr.cpIdx[k+1]+1), p = r.spPos[k];
+      if (seg.length < 2) continue;
+      routeGroup.add(tube(thin(seg, 120), p == null ? 0xbbbbbb : new THREE.Color(`rgb(${heatRGB(posT(p)).join(',')})`), 0.016));
+    }
+  } else routeGroup.add(tube(thin(tr.pts, 900), 0xffffff, 0.011));
+  routeGroup.add(tube(thin(tr.pts, 900).map(p => ({...p, h:p.h-4})), 0x2a1d17, 0.019));
+  const hand = new Set([0, ...r.courseEnds]), seen = {};
+  r.course.forEach((name, i) => {
+    const p = tr.pts[tr.cpIdx[i]], ho = hand.has(i), k = key(name);
+    if (seen[k]) { if (ho && i !== r.course.length-1) seen[k].el.textContent += ` · H/O ${r.courseEnds.indexOf(i)+1}`; return; }
+    const m = new THREE.Mesh(new THREE.SphereGeometry(ho ? 0.055 : 0.035, 16, 12), new THREE.MeshBasicMaterial({color: ho ? 0xA8461F : 0x1A2326}));
+    m.position.set(wx(p.E), wy(p.h) + 0.02, wz(p.N)); routeGroup.add(m);
+    const el = document.createElement('div'); el.className = 'lbl' + (ho ? ' ho' : '');
+    el.textContent = i === 0 ? `${name} · Start` : ho ? `${name} · H/O ${r.courseEnds.indexOf(i)+1}` : name;
+    el.hidden = !$('#lbls').checked; box.appendChild(el);
+    seen[k] = {el, v:m.position.clone().add(new THREE.Vector3(0, 0.05, 0))}; cpLabels.push(seen[k]);
+  });
+  const base = segSet(r.course);
+  entries.forEach(e => {
+    if ([...segSet(e.cps)].some(s => !base.has(s))) routeGroup.add(tube(thin(e.track.pts, 500), new THREE.Color(css(e.colorVar)), 0.008));
+  });
+  $('#routeBadge').textContent = `${$('#heatRoute').checked ? (r.spPos ? 'Coloured by split position · ' : 'No split positions this year · ') : ''}Course: ${mapYear}${r.y === 2017 ? ' (short course)' : r.y <= 2010 ? ' (Sykeside start and finish)' : ''}`;
+}
+function buildDots() {
+  dotObjs.forEach(d => { dotGroup.remove(d.m); dotGroup.remove(d.pin); d.el.remove(); }); dotObjs = [];
+  entries.forEach(e => {
+    const col = new THREE.Color(css(e.colorVar));
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.06, 20, 14), new THREE.MeshBasicMaterial({color:col}));
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.3, 6), new THREE.MeshBasicMaterial({color:col}));
+    dotGroup.add(m); dotGroup.add(pin);
+    const el = document.createElement('div'); el.className = 'rlbl'; el.style.background = css(e.colorVar); el.textContent = e.tag; box.appendChild(el);
+    dotObjs.push({e, m, pin, el});
+  });
+}
+function rebuildAll() {
+  Object.values(tracks).forEach(heightTrack);
+  entries = entries.map(e => { const n = mk(e.src); n.colorVar = e.colorVar; return n; });
+  updateTerrainGeometry(); buildRoutes(); buildDots(); renderCharts(); tick();
+}
+const tmpV = new THREE.Vector3();
+function project(v, el) {
+  tmpV.copy(v).project(camera);
+  const vis = tmpV.z < 1 && Math.abs(tmpV.x) < 1.1 && Math.abs(tmpV.y) < 1.1;
+  el.style.display = vis ? '' : 'none';
+  if (vis) { el.style.left = ((tmpV.x+1)/2*box.clientWidth) + 'px'; el.style.top = ((1-tmpV.y)/2*box.clientHeight) + 'px'; }
+}
+function placeDots() {
+  dotObjs.forEach(d => {
+    const p = entryPos(d.e, state.t); d.cur = p; const y = wy(p.h);
+    d.m.position.set(wx(p.E), y + 0.07, wz(p.N)); d.pin.position.set(wx(p.E), y + 0.15, wz(p.N));
+  });
+}
+function resize() { const w = box.clientWidth, h = box.clientHeight; renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(box);
+function setSky() { scene.background = new THREE.Color(css('--sky') || '#DCE4E3'); }
+setSky();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setSky);
+new MutationObserver(setSky).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+
+function frame(ts) {
+  const dt = state.last ? Math.min(0.1, (ts - state.last)/1000) : 0; state.last = ts;
+  if (state.playing) {
+    state.t += dt * state.speed;
+    if (state.t >= maxT()) { state.t = maxT(); state.playing = false; $('#playBtn').textContent = '▶ Play'; }
+    tick();
+  }
+  controls.update();
+  renderer.render(scene, camera);
+  cpLabels.forEach(l => { if (!l.el.hidden) project(l.v, l.el); });
+  dotObjs.forEach(d => project(d.m.position.clone().add(new THREE.Vector3(0, 0.08, 0)), d.el));
+  requestAnimationFrame(frame);
+}
+function tick() {
+  placeDots();
+  $('#tSlider').value = Math.round(state.t / maxT() * 1000);
+  $('#clock').textContent = fmtL(state.t);
+  updateEntryStatus(); updateProfileMarkers(); updateProgressHead();
+}
+
+/* ---------- side panel ---------- */
+function renderEntries() {
+  $('#cnt').textContent = `${entries.length}/6`;
+  $('#entries').innerHTML = entries.length ? entries.map((e, i) => `<li class="entry"><span class="sw" style="background:var(${e.colorVar})"></span>
+    <span class="nm">${esc(e.title)}<small>${esc(e.sub)}</small></span>
+    <span class="st" id="st${i}"><b>${fmt(e.total, true)}</b>—</span>
+    <button class="x" data-rm="${i}" aria-label="Remove ${esc(e.title)}">×</button></li>`).join('')
+    : `<li class="cap">No pairings yet. Add one below or pick a quick comparison.</li>`;
+}
+function updateEntryStatus() {
+  entries.forEach((e, i) => {
+    const el = document.getElementById('st'+i); if (!el) return;
+    let txt;
+    if (state.t >= e.total) txt = 'Finished';
+    else { const k = dotObjs[i] && dotObjs[i].cur ? dotObjs[i].cur.k : 0; txt = `→ ${sh(e.cps[k+1])}`; }
+    el.innerHTML = `<b>${fmt(e.total, true)}</b>${txt}`;
+  });
+}
+$('#entries').addEventListener('click', ev => { const b = ev.target.closest('[data-rm]'); if (!b) return; entries.splice(+b.dataset.rm, 1); state.t = 0; onEntriesChanged(); });
+$('#addYear').innerHTML = RACED.slice().reverse().map(r => `<option value="${r.y}">${r.y}</option>`).join('');
+function fillLegs() {
+  const r = byYear[+$('#addYear').value];
+  $('#addLeg').innerHTML = r.runs.map(l => `<option value="${l.n}">Leg ${l.n} · ${pairName(l.a, l.b)} · ${fmtL(l.time)}${l.splits ? '' : ' (no splits)'}</option>`).join('') + (r.cps ? `<option value="0">Whole team · ${fmt(r.total, true)}</option>` : '');
+}
+fillLegs();
+$('#addYear').addEventListener('change', fillLegs);
+$('#addBtn').addEventListener('click', () => { const y = +$('#addYear').value, n = +$('#addLeg').value; addEntry(n ? runOf(y, n) : y); });
+$('#qSec').innerHTML = SECTIONS.map(s => `<option value="${s.id}">Leg ${s.id} route · ${s.name}</option>`).join('');
+const groupRuns = (sec, dir) => RUNS.filter(r => r.sec === sec && r.dir === dir && !r.short);
+$('#qFast').addEventListener('click', () => setEntries(groupRuns(+$('#qSec').value, $('#qDir').value).sort((a, b) => a.time - b.time).slice(0, 6)));
+$('#qRecent').addEventListener('click', () => setEntries(groupRuns(+$('#qSec').value, $('#qDir').value).sort((a, b) => b.year - a.year || a.n - b.n).slice(0, 6)));
+const PRESETS = [
+  ['Best team runs', [2022, 2024, 2023, 2021, 2015, 2016]],
+  ["O'Brien brothers", [runOf(2024,1), runOf(2023,3), runOf(2016,3), runOf(2015,3), runOf(2010,2), runOf(2003,1)]],
+  ['Leg 2 route, both directions', [runOf(2022,2), runOf(2024,2), runOf(2010,2), runOf(2009,2), runOf(2007,2), runOf(2005,3)]],
+  ['Club records by era', [runOf(2003,2), runOf(2015,1), runOf(2024,3), runOf(2022,2)]]
+];
+$('#presets').innerHTML = PRESETS.map((p, i) => `<button data-p="${i}">${esc(p[0])}</button>`).join('');
+$('#presets').addEventListener('click', ev => { const b = ev.target.closest('[data-p]'); if (b) setEntries(PRESETS[+b.dataset.p][1]); });
+
+function onEntriesChanged() {
+  if (entries.length && !entries.some(e => e.year === mapYear)) { mapYear = entries[0].year; $('#mapYear').value = mapYear; }
+  renderEntries(); buildRoutes(); buildDots(); renderCharts(); tick();
+  $('#playBtn').textContent = '▶ Play';
+}
+$('#mapYear').innerHTML = RACED.slice().reverse().map(r => `<option value="${r.y}">${r.y}${r.y === 2017 ? ' (short)' : r.y <= 2010 ? ' (Sykeside)' : ''}</option>`).join('');
+$('#mapYear').value = mapYear;
+$('#mapYear').addEventListener('change', e => { mapYear = +e.target.value; buildRoutes(); });
+$('#exag').addEventListener('input', e => { EX = +e.target.value; $('#exagV').textContent = EX.toFixed(1); rebuildAll(); });
+$('#heatRoute').addEventListener('change', buildRoutes);
+$('#lbls').addEventListener('change', e => cpLabels.forEach(l => l.el.hidden = !e.target.checked));
+$('#resetV').addEventListener('click', resetView);
+$('#playBtn').addEventListener('click', () => {
+  if (!entries.length) return;
+  if (state.t >= maxT()) state.t = 0;
+  state.playing = !state.playing; $('#playBtn').textContent = state.playing ? '❚❚ Pause' : '▶ Play';
+});
+$('#tSlider').addEventListener('input', e => { state.t = +e.target.value/1000*maxT(); tick(); });
+$('#spd').addEventListener('change', e => state.speed = +e.target.value);
+
+/* ---------- OS Terrain 50 loader ---------- */
+const tiles = [];
+function parseAsc(txt) {
+  const lines = txt.split(/\r?\n/); const hdr = {}; let i = 0;
+  for (; i < lines.length; i++) { const m = lines[i].trim().match(/^([a-zA-Z_]+)\s+(-?[\d.eE+-]+)$/); if (!m) break; hdr[m[1].toLowerCase()] = +m[2]; }
+  const nc = hdr.ncols, nr = hdr.nrows, cs = hdr.cellsize;
+  const xll = hdr.xllcorner != null ? hdr.xllcorner : hdr.xllcenter - cs/2, yll = hdr.yllcorner != null ? hdr.yllcorner : hdr.yllcenter - cs/2;
+  if (!nc || !nr || !cs) throw new Error('missing header');
+  const vals = new Float32Array(nc*nr); let k = 0;
+  for (; i < lines.length && k < vals.length; i++) { const parts = lines[i].trim().split(/\s+/); for (const p of parts) if (p !== '') vals[k++] = +p; }
+  return {nc, nr, cs, xll, yll, vals, nodata: hdr.nodata_value};
+}
+function tileH(E, N) {
+  for (const t of tiles) {
+    const fx = (E - t.xll)/t.cs - 0.5, fyTop = (t.yll + t.nr*t.cs - N)/t.cs - 0.5;
+    if (fx < 0 || fyTop < 0 || fx > t.nc-1 || fyTop > t.nr-1) continue;
+    const i = Math.min(t.nc-2, Math.floor(fx)), j = Math.min(t.nr-2, Math.floor(fyTop)), tx = fx-i, ty = fyTop-j, v = t.vals;
+    const a = v[j*t.nc+i], b = v[j*t.nc+i+1], c = v[(j+1)*t.nc+i], d = v[(j+1)*t.nc+i+1];
+    if ([a,b,c,d].some(x => x === t.nodata)) continue;
+    return a*(1-tx)*(1-ty) + b*tx*(1-ty) + c*(1-tx)*ty + d*tx*ty;
+  }
+  return null;
+}
+const WANT = /(^|[\/_])ny(30|31|40|41)[^\/]*$/i;
+async function readZip(blob, out, bad, depth) {
+  const z = await JSZip.loadAsync(blob);
+  const names = Object.keys(z.files).filter(n => !z.files[n].dir);
+  const ascs = names.filter(n => /\.asc$/i.test(n)), zips = names.filter(n => /\.zip$/i.test(n));
+  const pickA = ascs.filter(n => WANT.test(n)), pickZ = zips.filter(n => WANT.test(n));
+  for (const n of (pickA.length || zips.length ? pickA : ascs)) { try { out.push(parseAsc(await z.files[n].async('string'))); } catch (e) { bad.push(n); } }
+  if (depth < 3) for (const n of pickZ) await readZip(await z.files[n].async('blob'), out, bad, depth + 1);
+}
+$('#ascIn').addEventListener('change', async ev => {
+  const files = [...ev.target.files], bad = [], b = $('#terrBadge');
+  b.className = 'badge'; b.textContent = 'Reading terrain files…';
+  for (const f of files) {
+    try {
+      if (/\.zip$/i.test(f.name)) { if (!window.JSZip) throw new Error('zip reader unavailable'); const before = tiles.length; await readZip(f, tiles, bad, 0); if (tiles.length === before) bad.push(f.name + ' (no NY30/31/40/41 tiles inside)'); }
+      else tiles.push(parseAsc(await f.text()));
+    } catch (e) { bad.push(f.name); }
+  }
+  let covered = 0;
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) { const h = tileH(E0 + i*STEP, N0 + j*STEP); const k = j*NX+i; if (h != null) { HG[k] = h; covered++; } else HG[k] = TPS[k]; }
+  const pct = Math.round(covered/(NX*NY)*100);
+  terrainSrc = pct > 0 ? 'os' : 'model';
+  setTerrainBadge(pct, bad); rebuildAll();
+  ev.target.value = '';
+});
+function setTerrainBadge(pct, bad) {
+  const b = $('#terrBadge');
+  if (terrainSrc === 'os') { b.className = 'badge'; b.textContent = `Terrain: OS Terrain 50 · ${pct}% of map${pct < 100 ? ' (rest modelled)' : ''}`; }
+  else if (terrainSrc === 'live') { b.className = 'badge'; b.textContent = 'Terrain: real elevation (AWS Terrain Tiles, ~30 m)'; }
+  else { b.className = 'badge warn'; b.textContent = bad && bad.length ? `Could not read ${bad.join(', ')}` : 'Terrain: modelled from OS spot heights (approximate)'; }
+  $('#terrNote').textContent = terrainSrc === 'os'
+    ? `OS Terrain 50 (50 m grid) loaded for ${pct}% of the map area.`
+    : terrainSrc === 'live'
+    ? 'Real elevation loaded when the page opened, from the free AWS Terrain Tiles service (built from SRTM and other public elevation data, roughly 30 m resolution in Britain). OS Terrain 50 files can still be loaded on top with the button under the map.'
+    : `The page tries to fetch real elevation when it opens; where that is blocked (as inside claude.ai) it falls back to relief interpolated from about ${SPOTS.length} spot heights. Summit and pass heights are right; slopes between them are smoothed, so crags look softer than they are and profile ascents are estimates. Uphill, downhill and mixed split labels are set by hand from the real ground, not from this model.`;
+}
+
+/* ---------- live terrain: AWS Terrain Tiles (terrarium PNG), needs a normal web page, blocked inside claude.ai ---------- */
+function osgbToWgs84(E, N) {
+  const a = 6377563.396, b = 6356256.909, F0 = 0.9996012717, lat0 = 49*Math.PI/180, lon0 = -2*Math.PI/180, Nn = -100000, Ee = 400000;
+  const e2 = 1 - (b*b)/(a*a), n = (a-b)/(a+b);
+  let lat = lat0, M = 0;
+  do {
+    lat = (N - Nn - M)/(a*F0) + lat;
+    const Ma = (1 + n + 1.25*n*n + 1.25*n**3)*(lat-lat0), Mb = (3*n + 3*n*n + 21/8*n**3)*Math.sin(lat-lat0)*Math.cos(lat+lat0),
+      Mc = (15/8*n*n + 15/8*n**3)*Math.sin(2*(lat-lat0))*Math.cos(2*(lat+lat0)), Md = 35/24*n**3*Math.sin(3*(lat-lat0))*Math.cos(3*(lat+lat0));
+    M = b*F0*(Ma - Mb + Mc - Md);
+  } while (Math.abs(N - Nn - M) >= 0.00001);
+  const s = Math.sin(lat), c = Math.cos(lat), t = Math.tan(lat);
+  const nu = a*F0/Math.sqrt(1 - e2*s*s), rho = a*F0*(1-e2)/Math.pow(1 - e2*s*s, 1.5), eta2 = nu/rho - 1;
+  const VII = t/(2*rho*nu), VIII = t/(24*rho*nu**3)*(5 + 3*t*t + eta2 - 9*t*t*eta2), IX = t/(720*rho*nu**5)*(61 + 90*t*t + 45*t**4);
+  const X = 1/(c*nu), XI = 1/(c*6*nu**3)*(nu/rho + 2*t*t), XII = 1/(c*120*nu**5)*(5 + 28*t*t + 24*t**4), XIIA = 1/(c*5040*nu**7)*(61 + 662*t*t + 1320*t**4 + 720*t**6);
+  const dE = E - Ee;
+  const phi = lat - VII*dE**2 + VIII*dE**4 - IX*dE**6, lam = lon0 + X*dE - XI*dE**3 + XII*dE**5 - XIIA*dE**7;
+  const nu2 = a/Math.sqrt(1 - e2*Math.sin(phi)**2);
+  const x = nu2*Math.cos(phi)*Math.cos(lam), y = nu2*Math.cos(phi)*Math.sin(lam), z = (1-e2)*nu2*Math.sin(phi);
+  const as = Math.PI/180/3600, tx = 446.448, ty = -125.157, tz = 542.060, sc = -20.4894e-6, rx = 0.1502*as, ry = 0.2470*as, rz = 0.8421*as;
+  const x2 = tx + (1+sc)*x - rz*y + ry*z, y2 = ty + rz*x + (1+sc)*y - rx*z, z2 = tz - ry*x + rx*y + (1+sc)*z;
+  const A = 6378137, B = 6356752.3142, e22 = 1 - (B*B)/(A*A), p = Math.hypot(x2, y2);
+  let la = Math.atan2(z2, p*(1-e22)), prev;
+  do { prev = la; const nn = A/Math.sqrt(1 - e22*Math.sin(la)**2); la = Math.atan2(z2 + e22*nn*Math.sin(la), p); } while (Math.abs(la - prev) > 1e-12);
+  return [la*180/Math.PI, Math.atan2(y2, x2)*180/Math.PI];
+}
+function loadImg(src, ms) {
+  return new Promise((res, rej) => { const im = new Image(); im.crossOrigin = 'anonymous'; const t = setTimeout(() => rej(new Error('timeout')), ms);
+    im.onload = () => { clearTimeout(t); res(im); }; im.onerror = () => { clearTimeout(t); rej(new Error('blocked')); }; im.src = src; });
+}
+async function loadLiveTerrain() {
+  const Z = 12, scale = 256 * 2**Z, PX = new Float64Array(NX*NY), PY = new Float64Array(NX*NY);
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    const [la, lo] = osgbToWgs84(E0 + i*STEP, N0 + j*STEP), k = j*NX+i, r = la*Math.PI/180;
+    PX[k] = (lo + 180)/360*scale; PY[k] = (1 - Math.log(Math.tan(r) + 1/Math.cos(r))/Math.PI)/2*scale;
+  }
+  let mnx = Infinity, mxx = -Infinity, mny = Infinity, mxy = -Infinity;
+  for (let k = 0; k < PX.length; k++) { mnx = Math.min(mnx, PX[k]); mxx = Math.max(mxx, PX[k]); mny = Math.min(mny, PY[k]); mxy = Math.max(mxy, PY[k]); }
+  const tx0 = Math.floor(mnx/256), tx1 = Math.floor(mxx/256), ty0 = Math.floor(mny/256), ty1 = Math.floor(mxy/256);
+  const cw = (tx1-tx0+1)*256, ch = (ty1-ty0+1)*256, cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+  const ctx = cv.getContext('2d', {willReadFrequently:true}), jobs = [];
+  for (let tx = tx0; tx <= tx1; tx++) for (let ty = ty0; ty <= ty1; ty++)
+    jobs.push(loadImg(`https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${Z}/${tx}/${ty}.png`, 9000).then(im => ctx.drawImage(im, (tx-tx0)*256, (ty-ty0)*256)));
+  await Promise.all(jobs);
+  const d = ctx.getImageData(0, 0, cw, ch).data, H = new Float32Array(cw*ch);
+  for (let q = 0; q < H.length; q++) H[q] = d[q*4]*256 + d[q*4+1] + d[q*4+2]/256 - 32768;
+  const out = new Float32Array(NX*NY);
+  for (let k = 0; k < out.length; k++) {
+    const fx = PX[k] - tx0*256 - 0.5, fy = PY[k] - ty0*256 - 0.5, i = Math.max(0, Math.min(cw-2, Math.floor(fx))), j = Math.max(0, Math.min(ch-2, Math.floor(fy))), u = fx-i, v = fy-j;
+    out[k] = H[j*cw+i]*(1-u)*(1-v) + H[j*cw+i+1]*u*(1-v) + H[(j+1)*cw+i]*(1-u)*v + H[(j+1)*cw+i+1]*u*v;
+  }
+  const sane = out.every(h => h > 100 && h < 1000);
+  if (!sane) throw new Error('unexpected values');
+  return out;
+}
+
+/* ---------- charts ---------- */
+function renderCharts() { renderProfile(); renderProgress(); renderSplits(); }
+let profCtx = null;
+const revKey = k => k.split('>').reverse().join('>');
+function renderProfile() {
+  const e = entries[0];
+  if (!e) { $('#profile').innerHTML = ''; $('#profMeta').textContent = ''; $('#profCap').textContent = 'Add a pairing to see its profile.'; profCtx = null; return; }
+  const tr = e.track, P = tr.pts;
+  const dist = P[P.length-1].d, asc = P[P.length-1].asc;
+  const hs = P.map(p => p.h), lo = Math.floor((Math.min(...hs)-30)/100)*100, hi = Math.ceil((Math.max(...hs)+40)/100)*100;
+  const Wd = 640, Ht = 222, L = 40, R = 10, Tp = 26, B = 36;
+  const X = d => L + d/dist*(Wd-L-R), Y = h => Tp + (1-(h-lo)/(hi-lo))*(Ht-Tp-B);
+  const st = Math.max(1, Math.floor(P.length/400));
+  const line = P.filter((_, i) => i % st === 0 || i === P.length-1).map((p, i) => `${i?'L':'M'}${X(p.d).toFixed(1)},${Y(p.h).toFixed(1)}`).join('');
+  let g = '';
+  for (let h = lo; h <= hi; h += (hi-lo > 500 ? 200 : 100)) g += `<line class="ax" x1="${L}" x2="${Wd-R}" y1="${Y(h)}" y2="${Y(h)}"/><text x="${L-4}" y="${Y(h)+3}" text-anchor="end">${h}</text>`;
+  for (let km = 0; km <= dist/1000; km++) g += `<text x="${X(km*1000)}" y="${Ht-4}" text-anchor="middle">${km}</text>`;
+  let cpm = '', band = '';
+  for (let i = 0; i < e.cps.length; i++) { const p = P[tr.cpIdx[i]], x = X(p.d);
+    if (i < e.cps.length-1) { const c = cls(e.cps[i], e.cps[i+1]), x2 = X(P[tr.cpIdx[i+1]].d); band += `<rect x="${x}" y="${Ht-B+4}" width="${Math.max(0.5, x2-x-1)}" height="7" fill="var(--${c === 'U' ? 'up' : c === 'D' ? 'down' : c === 'M' ? 'mixed' : 'rule'})"><title>${esc(sh(e.cps[i]))} → ${esc(sh(e.cps[i+1]))}: ${CLSNAME[c]}</title></rect>`; }
+    cpm += `<line x1="${x}" x2="${x}" y1="${Y(p.h)}" y2="${Tp-2}" stroke="var(--rule)" stroke-dasharray="2 3"/><circle cx="${x}" cy="${Y(p.h)}" r="3" fill="var(--ink)"/>
+    <text x="${x}" y="${i%2 ? Tp-4 : Tp-14}" text-anchor="${i===0?'start':i===e.cps.length-1?'end':'middle'}" style="fill:var(--ink)">${esc(sh(e.cps[i]))}</text>`; }
+  $('#profile').innerHTML = `<svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Elevation profile">${g}
+    <path d="${line}L${X(dist)},${Ht-B}L${L},${Ht-B}Z" fill="var(--accent)" opacity=".14"/>
+    <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="1.6"/>${band}${cpm}<g id="pmk"></g>
+    <text x="${Wd-R}" y="${Ht-16}" text-anchor="end">km</text></svg>`;
+  $('#profMeta').textContent = `${(dist/1000).toFixed(1)} km · ~${Math.round(asc/10)*10} m up`;
+  const rk = e.routeKey, others = entries.filter(x => x.routeKey !== rk && x.routeKey !== revKey(rk)).length, mirrored = entries.some(x => x.routeKey === revKey(rk));
+  $('#profCap').innerHTML = `${esc(e.title)}. Coloured band: <span class="c-U">▲ uphill</span> <span class="c-D">▼ downhill</span> <span class="c-M">◆ mixed</span>.${mirrored ? ' Reverse-direction runs are plotted on this same axis.' : ''}${others ? ` ${others} pairing${others>1?'s':''} on a different route not shown.` : ''}`;
+  profCtx = {e, X, Y, dist};
+}
+function updateProfileMarkers() {
+  const g = document.getElementById('pmk'); if (!g || !profCtx) return;
+  const rk = profCtx.e.routeKey;
+  g.innerHTML = dotObjs.filter(d => d.cur && (d.e.routeKey === rk || d.e.routeKey === revKey(rk))).map(d => {
+    const len = d.e.track.pts[d.e.track.pts.length-1].d, rev = d.e.routeKey !== rk;
+    const frac = (rev ? len - d.cur.d : d.cur.d) / len;
+    return `<circle cx="${profCtx.X(frac*profCtx.dist)}" cy="${profCtx.Y(d.cur.h)}" r="5" fill="var(${d.e.colorVar})" stroke="var(--panel)" stroke-width="1.5"/>`;
+  }).join('');
+}
+let progCtx = null;
+function renderProgress() {
+  const Wd = 640, Ht = 230, L = 46, R = 12, Tp = 12, B = 46;
+  if (!entries.length) { $('#progress').innerHTML = ''; $('#progCap').textContent = ''; progCtx = null; return; }
+  const same = entries.every(e => e.routeKey === entries[0].routeKey);
+  if (same && entries.length > 1) {
+    const e0 = entries[0], n = e0.cum.length;
+    const known = (e, k) => !e.est || k === 0 || k === n-1;
+    const best = e0.cum.map((_, k) => Math.min(...entries.filter(e => known(e, k)).map(e => e.cum[k])));
+    const gaps = entries.map(e => e.cum.map((c, k) => known(e, k) ? c - best[k] : null));
+    const mg = Math.max(60, ...gaps.flat().filter(x => x != null)), stepT = mg > 1800 ? 600 : mg > 900 ? 300 : mg > 300 ? 120 : 60, top = Math.ceil(mg/stepT)*stepT;
+    const X = k => L + k/(n-1)*(Wd-L-R), Y = g => Tp + g/top*(Ht-Tp-B);
+    let s = '';
+    for (let g = 0; g <= top; g += stepT) s += `<line class="ax" x1="${L}" x2="${Wd-R}" y1="${Y(g)}" y2="${Y(g)}"/><text x="${L-4}" y="${Y(g)+3}" text-anchor="end">+${fmt(g)}</text>`;
+    for (let k = 0; k < n; k++) s += `<text transform="translate(${X(k)},${Ht-B+10}) rotate(35)" text-anchor="start">${esc(sh(e0.cps[k]))}</text>`;
+    entries.forEach((e, i) => {
+      const pts = gaps[i].map((g, k) => g == null ? null : [X(k), Y(g), k]).filter(Boolean);
+      s += `<path d="${pts.map((p, j) => `${j?'L':'M'}${p[0]},${p[1]}`).join('')}" fill="none" stroke="var(${e.colorVar})" stroke-width="2" ${e.est ? 'stroke-dasharray="5 4"' : ''}/>`;
+      s += pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="2.6" fill="var(${e.colorVar})"><title>${esc(e.title)} at ${esc(e.cps[p[2]])}: ${fmtL(e.cum[p[2]])} (+${fmt(gaps[i][p[2]])})</title></circle>`).join('');
+    });
+    $('#progH').textContent = 'Gap to the fastest';
+    $('#progress').innerHTML = `<svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Time gap at each checkpoint">${s}</svg>`;
+    $('#progCap').textContent = `Time behind the quickest selected pairing at each checkpoint. A rising line is losing time on that split.${entries.some(e => e.est) ? ' Dashed lines have a leg time only, so they join start to finish.' : ''}`;
+    progCtx = null;
+  } else {
+    const mt = maxT(), stepT = mt > 9000 ? 3600 : mt > 3600 ? 1800 : 600, right = Math.ceil(mt/stepT)*stepT;
+    const md = Math.max(...entries.map(e => e.track.pts[e.track.pts.length-1].d))/1000, topD = Math.ceil(md);
+    const X = t => L + t/right*(Wd-L-R), Y = d => Tp + (1-d/topD)*(Ht-Tp-B+20);
+    let s = '';
+    for (let d = 0; d <= topD; d += topD > 12 ? 5 : topD > 6 ? 2 : 1) s += `<line class="ax" x1="${L}" x2="${Wd-R}" y1="${Y(d)}" y2="${Y(d)}"/><text x="${L-4}" y="${Y(d)+3}" text-anchor="end">${d} km</text>`;
+    for (let t = 0; t <= right; t += stepT) s += `<text x="${X(t)}" y="${Ht-12}" text-anchor="middle">${fmtL(t)}</text>`;
+    entries.forEach(e => {
+      const pts = e.cum.map((c, k) => [X(c), Y(e.track.pts[e.track.cpIdx[k]].d/1000), k]).filter((p, k, a) => !e.est || k === 0 || k === a.length-1);
+      s += `<path d="${pts.map((p, k) => `${k?'L':'M'}${p[0]},${p[1]}`).join('')}" fill="none" stroke="var(${e.colorVar})" stroke-width="2" ${e.est ? 'stroke-dasharray="5 4"' : ''}/>`;
+      s += pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="2.6" fill="var(${e.colorVar})"><title>${esc(e.title)} at ${esc(e.cps[p[2]])}: ${fmtL(e.cum[p[2]])}</title></circle>`).join('');
+    });
+    s += `<line id="phd" x1="${L}" x2="${L}" y1="${Tp}" y2="${Ht-B+20}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3"/>`;
+    $('#progH').textContent = entries.length > 1 ? 'Distance against time' : 'Progress';
+    $('#progress').innerHTML = `<svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Distance covered against time">${s}</svg>`;
+    $('#progCap').textContent = `${entries.length > 1 ? 'These pairings ran different routes or directions, so this compares distance covered against elapsed time. Steeper is faster.' : 'Distance covered against elapsed time.'} Dashed vertical line is the playback clock.${entries.some(e => e.est) ? ' Dashed traces have a leg time only.' : ''}`;
+    progCtx = {X};
+  }
+}
+function updateProgressHead() { const l = document.getElementById('phd'); if (l && progCtx) { const x = progCtx.X(state.t); l.setAttribute('x1', x); l.setAttribute('x2', x); } }
+const swatch = e => `<span class="sw" style="display:inline-block;background:var(${e.colorVar});margin-right:6px;vertical-align:-1px"></span>`;
+function renderSplits() {
+  if (!entries.length) { $('#splits').innerHTML = '<p class="cap" style="padding:12px">Add a pairing to see its splits.</p>'; return; }
+  const same = entries.every(e => e.routeKey === entries[0].routeKey);
+  const cell = (e, k) => {
+    if (e.est && k < e.cps.length-1) return {sp:Infinity, html:'<span class="muted">—</span>', cum:'', cpos:null};
+    const sp = e.est ? e.total : e.splits[k-1], pp = e.spPos ? e.spPos[k-1] : null;
+    return {sp, html:`<span class="num">${e.est ? '' : fmt(sp)}</span>${chip(pp)}`, cum:fmtL(e.cum[k]), cpos: e.cumPos ? e.cumPos[k-1] : null};
+  };
+  let h = '';
+  if (same) {
+    const e0 = entries[0];
+    h = `<table><thead><tr><th>Checkpoint</th>${entries.map(e => `<th>${swatch(e)}${esc(e.short)}</th>`).join('')}</tr></thead><tbody>`;
+    for (let k = 1; k < e0.cum.length; k++) {
+      const cs = entries.map(e => cell(e, k)), fin = cs.filter(c => isFinite(c.sp)), best = Math.min(...fin.map(c => c.sp));
+      h += `<tr><td>${glyph(cls(e0.cps[k-1], e0.cps[k]))}${esc(e0.cps[k])}</td>${cs.map(c => `<td class="${c.sp===best && fin.length>1 && k < e0.cum.length ? 'best' : ''}">${c.html} <span class="muted num" style="margin-left:8px">${c.cum}</span>${c.cpos ? ` <span class="muted num">(${ord(c.cpos)})</span>` : ''}</td>`).join('')}</tr>`;
+    }
+    h += `<tr><td><b>Total</b></td>${entries.map(e => `<td><b class="num">${fmt(e.total, true)}</b>${e.run && e.run.pos ? chip(e.run.pos) : (e.team ? chip(e.race.pos) : '')}</td>`).join('')}</tr></tbody></table>`;
+  } else {
+    const rows = Math.max(...entries.map(e => e.cum.length));
+    h = `<table><thead><tr>${entries.map(e => `<th colspan="2">${swatch(e)}${esc(e.short)}</th>`).join('')}</tr></thead><tbody>`;
+    for (let k = 1; k < rows; k++) h += `<tr>${entries.map(e => k < e.cum.length ? `<td>${glyph(cls(e.cps[k-1], e.cps[k]))}${esc(sh(e.cps[k]))}</td><td>${cell(e, k).html}</td>` : '<td></td><td></td>').join('')}</tr>`;
+    h += `<tr>${entries.map(e => `<td><b>Total</b></td><td><b class="num">${fmt(e.total, true)}</b>${e.run && e.run.pos ? chip(e.run.pos) : ''}</td>`).join('')}</tr></tbody></table>`;
+  }
+  const notes = [...new Set(entries.map(e => e.run ? e.run.race : e.race).filter(r => r.note).map(r => `${r.y}: ${r.note}`))];
+  const legNotes = entries.filter(e => e.run && (e.run.up || e.run.note)).map(e => `${e.year} leg ${e.run.n}: ${e.run.up ? `captain's estimate ~${ord(e.run.up)} on the climbs, ~${ord(e.run.down)} on the descents. ` : ''}${e.run.note || ''}`);
+  const all = [...notes, ...legNotes, ...(entries.some(e => e.est) ? ['Runs before 2009 have a leg time only; their checkpoint times are not recorded.'] : [])];
+  $('#splits').innerHTML = h + (all.length ? `<div style="padding:10px 12px" class="cap">${all.map(esc).join('<br>')}</div>` : '');
+}
+
+/* ---------- history ---------- */
+const tip = $('#tip');
+const showTip = (ev, html) => { tip.innerHTML = html; tip.hidden = false; const x = Math.min(window.innerWidth - 270, ev.clientX + 12); tip.style.left = x + 'px'; tip.style.top = (ev.clientY + 14) + 'px'; };
+(function history() {
+  const Wd = 980, Ht = 280, L = 40, R = 16, Tp = 22, B = 44, y0 = 2000, y1 = 2026, maxP = 70;
+  const X = y => L + (y-y0)/(y1-y0)*(Wd-L-R), Y = p => Tp + (p-1)/(maxP-1)*(Ht-Tp-B);
+  let s = '';
+  for (const p of [1, 10, 20, 30, 40, 50, 60, 70]) s += `<line class="ax" x1="${L}" x2="${Wd-R}" y1="${Y(p)}" y2="${Y(p)}"/><text x="${L-6}" y="${Y(p)+3}" text-anchor="end">${p}</text>`;
+  for (let y = y0; y <= y1; y += 2) s += `<text x="${X(y)}" y="${Ht-B+16}" text-anchor="middle">${y}</text>`;
+  let path = '', prev = null;
+  RACES.forEach(r => { if (r.none) { prev = null; return; } path += `${prev ? 'L' : 'M'}${X(r.y)},${Y(r.pos)}`; prev = r; });
+  s += `<path d="${path}" fill="none" stroke="var(--muted)" stroke-width="1.4"/>`;
+  RACES.filter(r => r.none).forEach(r => s += `<text x="${X(r.y)}" y="${Ht-B+30}" text-anchor="middle" style="fill:var(--accent)">${r.y === 2001 ? 'F&M' : r.y === 2020 ? 'COVID' : r.y === 2025 ? 'Storm' : r.y === 2019 ? 'No entry' : '—'}</text><line x1="${X(r.y)}" x2="${X(r.y)}" y1="${Tp}" y2="${Ht-B}" stroke="var(--rule)" stroke-dasharray="2 4"/>`);
+  s += `<line x1="${X(2026)}" x2="${X(2026)}" y1="${Tp}" y2="${Ht-B}" stroke="var(--accent)" stroke-dasharray="4 3"/><text x="${X(2026)-4}" y="${Tp-6}" text-anchor="end" style="fill:var(--accent)">3 Oct 2026</text>`;
+  RACED.forEach(r => {
+    const mixed = r.cat === 'Mixed';
+    s += `<g class="hpt" data-y="${r.y}" style="cursor:${r.cps ? 'pointer' : 'default'}"><circle cx="${X(r.y)}" cy="${Y(r.pos)}" r="10" fill="transparent"/>
+      <circle cx="${X(r.y)}" cy="${Y(r.pos)}" r="5.5" fill="${mixed ? 'var(--panel)' : 'var(--ink)'}" stroke="var(--ink)" stroke-width="2"/>
+      <text x="${X(r.y)}" y="${Y(r.pos)-10}" text-anchor="middle" style="fill:var(--ink)">${r.pos}</text></g>`;
+  });
+  $('#history').innerHTML = `<svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Final positions by year">${s}</svg><div class="legend"><span><i style="background:var(--ink);width:10px;height:10px;border-radius:50%"></i>Open team</span><span><i style="background:var(--panel);border:2px solid var(--ink);width:10px;height:10px;border-radius:50%"></i>Mixed team</span></div>`;
+  const svg = $('#history svg');
+  svg.addEventListener('mousemove', ev => { const g = ev.target.closest('.hpt'); if (!g) { tip.hidden = true; return; } const r = byYear[+g.dataset.y];
+    showTip(ev, `<b>${r.y}</b> · ${ord(r.pos)} · ${r.time} · ${r.cat}<br>${r.runs.map(l => `L${l.n} ${esc(pairName(l.a, l.b))} ${fmtL(l.time)}`).join('<br>')}${r.cps ? '<br><i>Click to add whole team</i>' : ''}`); });
+  svg.addEventListener('mouseleave', () => tip.hidden = true);
+  svg.addEventListener('click', ev => { const g = ev.target.closest('.hpt'); if (g && byYear[+g.dataset.y].cps) { addEntry(+g.dataset.y); box.scrollIntoView({behavior:smooth(), block:'center'}); } });
+})();
+
+/* ---------- leg board by route section ---------- */
+(function legboard() {
+  const row = (l, best) => `<tr class="click" data-id="${l.id}" tabindex="0"><td class="num">${l.year}<span class="tag">L${l.n}</span></td>
+    <td style="white-space:normal">${esc(pairName(l.a, l.b))}${l.sec === 3 && NORM(l.cps[l.dir === 'fwd' ? l.cps.length-1 : 0]) === 'BW' && key(l.cps[l.dir === 'fwd' ? l.cps.length-1 : 0]) !== 'Hartsop Hall' ? ` <span class="muted">(${l.dir === 'fwd' ? 'to' : 'from'} Brotherswater)</span>` : ''}</td>
+    <td class="r num ${best ? 'best' : ''}">${fmtL(l.time)}${l.splits ? '' : '<span class="muted" title="Leg time only">*</span>'}</td><td class="r">${chip(l.pos) || '<span class="muted">—</span>'}</td></tr>`;
+  $('#legboard').innerHTML = SECTIONS.map(s => {
+    const fwd = groupRuns(s.id, 'fwd').sort((a, b) => a.time - b.time);
+    const rev = groupRuns(s.id, 'rev').sort((a, b) => a.time - b.time);
+    const shortR = RUNS.filter(r => r.short && r.sec === s.id).sort((a, b) => a.time - b.time);
+    const thead = `<thead><tr><th>Year · leg</th><th>Pair</th><th class="r">Time</th><th class="r">Pos</th></tr></thead>`;
+    return `<div class="card"><div style="display:flex;flex-direction:column;gap:4px"><h3>Leg ${s.id} route · ${s.name}</h3><div class="legmeta">via ${s.via} · ${s.meta}</div>
+      <div class="legsec"><button data-q="${s.id}" data-k="fast">6 fastest</button><button data-q="${s.id}" data-k="recent">6 most recent</button></div></div>
+      <table>${thead}<tbody>${fwd.map((l, i) => row(l, i === 0)).join('')}
+      ${rev.length ? `<tr><td colspan="4" class="group">Reversed: ${esc(s.name.split(' – ').reverse().join(' – '))}</td></tr>${rev.map((l, i) => row(l, i === 0)).join('')}` : ''}
+      ${shortR.length ? `<tr><td colspan="4" class="group">2017 short course</td></tr>${shortR.map(l => row(l, false)).join('')}` : ''}
+      </tbody></table></div>`;
+  }).join('') + `<p class="cap" style="grid-column:1/-1">* leg time only, no checkpoint splits (2000–2007). Pos is position on the leg where the sheet records it.</p>`;
+  const go = ev => {
+    const b = ev.target.closest('[data-q]');
+    if (b) { const g = groupRuns(+b.dataset.q, 'fwd'); setEntries(b.dataset.k === 'fast' ? g.sort((a, c) => a.time - c.time).slice(0, 6) : g.sort((a, c) => c.year - a.year).slice(0, 6)); box.scrollIntoView({behavior:smooth(), block:'center'}); return; }
+    const tr = ev.target.closest('tr[data-id]'); if (tr) addEntry(RUNS.find(r => r.id === tr.dataset.id));
+  };
+  $('#legboard').addEventListener('click', go);
+  $('#legboard').addEventListener('keydown', ev => { if (ev.key === 'Enter') go(ev); });
+})();
+
+/* ---------- climbers and descenders ---------- */
+const CL = {}, PAIRS = [], CLUB = [];
+RUNS.filter(r => r.spPos).forEach(run => {
+  const rec = {run, U:[], D:[], M:[]};
+  run.splits.forEach((s, k) => {
+    const c = cls(run.cps[k], run.cps[k+1]), p = run.spPos[k];
+    if (p == null || c === 'X') return;
+    const item = {p, c, year:run.year, n:run.n, seg:`${sh(run.cps[k])} → ${sh(run.cps[k+1])}`};
+    rec[c].push(item);
+    [run.a, run.b].forEach(nm => { const o = CL[nm] || (CL[nm] = {name:nm, U:[], D:[], M:[], runs:new Set()}); o[c].push(item); o.runs.add(run); });
+  });
+  PAIRS.push(rec);
+});
+SPLIT.filter(r => r.spPos).forEach(r => {
+  const o = {y:r.y, U:[], D:[], M:[]};
+  r.split.forEach((_, k) => { const c = cls(r.cps[k], r.cps[k+1]), p = r.spPos[k]; if (p != null && c !== 'X') o[c].push(p); });
+  CLUB.push(o);
+});
+const REF = 2024, HALF = 4;
+const wav = (arr, form) => { if (!arr.length) return null; let s = 0, ws = 0; arr.forEach(x => { const w = form ? Math.pow(0.5, (REF - x.year)/HALF) : 1; s += w*x.p; ws += w; }); return s/ws; };
+function computeCL() {
+  const form = $('#cWeight').value === 'form';
+  Object.values(CL).forEach(o => {
+    o.uF = wav(o.U, true); o.dF = wav(o.D, true);
+    o.u = wav(o.U, form); o.d = wav(o.D, form); o.m = wav(o.M, form);
+    o.diff = (o.u != null && o.d != null) ? o.d - o.u : null; o.n = o.U.length + o.D.length + o.M.length;
+  });
+}
+computeCL();
+function renderClimbStats() {
+  const form = $('#cWeight').value === 'form', lab = form ? ' (current form)' : '';
+  const pool = Object.values(CL).filter(o => o.U.length >= 3 && o.D.length >= 3);
+  const by = (f, dir) => pool.slice().sort((a, b) => dir*(f(a) - f(b)))[0];
+  const cl = by(o => o.diff, -1), de = by(o => o.diff, 1), bu = by(o => o.u, 1), bd = by(o => o.d, 1);
+  const allU = avg(CLUB.flatMap(o => o.U)), allD = avg(CLUB.flatMap(o => o.D)), allM = avg(CLUB.flatMap(o => o.M));
+  $('#climbStats').innerHTML = [
+    [cl.name, `strongest climber relative to descending${lab}: ${ord(Math.round(cl.u))} up vs ${ord(Math.round(cl.d))} down`],
+    [de.name, `strongest descender relative to climbing${lab}: ${ord(Math.round(de.d))} down vs ${ord(Math.round(de.u))} up`],
+    [bu.name, `best uphill position${lab} (${ord(Math.round(bu.u))}, ${bu.U.length} splits)`],
+    [bd.name, `best downhill position${lab} (${ord(Math.round(bd.d))}, ${bd.D.length} splits)`],
+    [`${Math.round(allU)} · ${Math.round(allD)} · ${Math.round(allM)}`, 'club average position on uphill · downhill · mixed splits, all years']
+  ].map(([b, s]) => `<div class="stat"><b style="font-size:1.45rem">${esc(b)}</b><span>${esc(s)}</span></div>`).join('') + `<p class="cap" style="grid-column:1/-1;padding:6px 14px;background:var(--panel)">Among runners with at least three uphill and three downhill splits.${form ? ` Current form weights each split by how recent it is: a split from ${REF-HALF} counts half as much as one from ${REF}, ${REF-2*HALF} a quarter.` : ''}</p>`;
+}
+function renderDumb() {
+  const minN = +$('#cMin').value, sort = $('#cSort').value;
+  const rows = Object.values(CL).filter(o => o.U.length >= minN && o.D.length >= minN);
+  const f = {diff:(a, b) => b.diff - a.diff, rdiff:(a, b) => a.diff - b.diff, u:(a, b) => a.u - b.u, d:(a, b) => a.d - b.d, n:(a, b) => b.n - a.n}[sort];
+  rows.sort(f);
+  const Wd = 900, L = 170, R = 150, rh = 26, Tp = 30, Ht = Tp + rows.length*rh + 26, maxP = 70;
+  const X = p => L + (p-1)/(maxP-1)*(Wd-L-R);
+  let s = '';
+  for (const p of [1, 10, 20, 30, 40, 50, 60, 70]) s += `<line class="ax" x1="${X(p)}" x2="${X(p)}" y1="${Tp-6}" y2="${Ht-20}"/><text x="${X(p)}" y="${Tp-12}" text-anchor="middle">${p}</text>`;
+  s += `<text x="${L}" y="${Ht-4}">field position (1 = fastest on that split)</text>`;
+  rows.forEach((o, i) => {
+    const y = Tp + i*rh + rh/2;
+    const lean = o.diff > 3 ? 'climber' : o.diff < -3 ? 'descender' : 'even';
+    const lc = lean === 'climber' ? 'var(--up)' : lean === 'descender' ? 'var(--down)' : 'var(--muted)';
+    s += `<g class="row" data-n="${esc(o.name)}" style="cursor:pointer"><rect class="hl" x="0" y="${y-rh/2}" width="${Wd}" height="${rh}" fill="transparent"/>
+      <text class="nm" x="${L-12}" y="${y+4}" text-anchor="end">${esc(o.name)}</text>
+      <line x1="${X(o.u)}" x2="${X(o.d)}" y1="${y}" y2="${y}" stroke="${lc}" stroke-width="3" opacity=".5"/>
+      ${o.m != null ? `<path d="M${X(o.m)},${y-5}l5,5l-5,5l-5,-5z" fill="var(--mixed)"/>` : ''}
+      <path d="M${X(o.u)},${y-7}l6,11h-12z" fill="var(--up)"/>
+      <path d="M${X(o.d)},${y+7}l6,-11h-12z" fill="var(--down)"/>
+      <text x="${Wd-R+12}" y="${y+4}" style="fill:${lc}">${lean === 'even' ? 'even' : `${lean} ${Math.abs(Math.round(o.diff))}`}</text>
+      <text x="${Wd-6}" y="${y+4}" text-anchor="end">${o.U.length}▲ ${o.D.length}▼ ${o.M.length}◆</text></g>`;
+  });
+  $('#dumb').innerHTML = rows.length ? `<svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Average field position uphill and downhill by runner">${s}</svg>` : '<p class="cap">No runners meet this minimum.</p>';
+}
+$('#dumb').addEventListener('mousemove', ev => { const g = ev.target.closest('.row'); if (!g) { tip.hidden = true; return; } const o = CL[g.dataset.n];
+  const list = c => o[c].map(x => `${x.year} L${x.n} ${esc(x.seg)} ${x.p}`).join('<br>');
+  showTip(ev, `<b>${esc(o.name)}</b><br><span class="c-U">▲</span> avg ${o.u.toFixed(1)}<br>${list('U')}<br><span class="c-D">▼</span> avg ${o.d.toFixed(1)}<br>${list('D')}${o.M.length ? `<br>◆ avg ${o.m.toFixed(1)}<br>${list('M')}` : ''}<br><i>Click for their runner card</i>`); });
+$('#dumb').addEventListener('mouseleave', () => tip.hidden = true);
+$('#dumb').addEventListener('click', ev => { const g = ev.target.closest('.row'); if (g) showRunner(g.dataset.n, true); });
+$('#cSort').addEventListener('change', renderDumb); $('#cMin').addEventListener('change', renderDumb);
+$('#cWeight').addEventListener('change', () => { computeCL(); renderClimbStats(); renderDumb(); });
+(function pairsTable() {
+  const a = arr => arr.length ? Math.round(avg(arr.map(x => x.p))) : null;
+  const rows = PAIRS.slice().sort((x, y) => y.run.year - x.run.year || x.run.n - y.run.n);
+  $('#pairsUD').innerHTML = `<table><thead><tr><th>Year · leg</th><th>Pair</th><th class="r c-U">▲ avg</th><th class="r c-D">▼ avg</th><th class="r c-M">◆ avg</th><th>Captain's est.</th></tr></thead><tbody>
+    ${rows.map(p => { const u = a(p.U), d = a(p.D), m = a(p.M); return `<tr class="click" data-id="${p.run.id}" tabindex="0"><td class="num">${p.run.year}<span class="tag">L${p.run.n}</span></td><td>${esc(pairName(p.run.a, p.run.b))}</td>
+      <td class="r">${chip(u) || '—'}</td><td class="r">${chip(d) || '—'}</td><td class="r">${chip(m) || '—'}</td><td class="muted num">${p.run.up ? `~${p.run.up} up / ~${p.run.down} down` : ''}</td></tr>`; }).join('')}
+  </tbody></table>`;
+  const go = ev => { const tr = ev.target.closest('tr[data-id]'); if (tr) addEntry(RUNS.find(r => r.id === tr.dataset.id)); };
+  $('#pairsUD').addEventListener('click', go); $('#pairsUD').addEventListener('keydown', ev => { if (ev.key === 'Enter') go(ev); });
+  $('#clubUD').innerHTML = `<table><thead><tr><th>Year</th><th class="r c-U">▲ uphill</th><th class="r c-D">▼ downhill</th><th class="r c-M">◆ mixed</th><th class="r">Final</th></tr></thead><tbody>
+    ${CLUB.map(o => `<tr><td class="num">${o.y}</td><td class="r">${chip(Math.round(avg(o.U)))}</td><td class="r">${chip(Math.round(avg(o.D)))}</td><td class="r">${chip(o.M.length ? Math.round(avg(o.M)) : null) || '—'}</td><td class="r">${chip(byYear[o.y].pos)}</td></tr>`).join('')}
+  </tbody></table><p class="cap" style="padding:8px 10px">Club average field position on each kind of split, by year.</p>`;
+})();
+
+/* ---------- runners ---------- */
+const R = {};
+RUNS.forEach(l => [[l.a, l.b], [l.b, l.a]].forEach(([me, pt]) => {
+  const o = R[me] || (R[me] = {name:me, years:new Set(), legs:[0,0,0,0], partners:{}, runs:[]});
+  o.years.add(l.year); if (l.sec) o.legs[l.sec-1]++; o.partners[pt] = (o.partners[pt] || 0) + 1; o.runs.push(l);
+}));
+function loadRunner(name) { const o = R[name]; setEntries(o.runs.slice().sort((a, b) => b.year - a.year).slice(0, 6)); box.scrollIntoView({behavior:smooth(), block:'center'}); }
+(function runners() {
+  const list = Object.values(R).sort((a, b) => b.years.size - a.years.size || a.name.localeCompare(b.name));
+  const ys = o => { const a = [...o.years].sort(); return a.length > 1 ? `${a[0]}–${a[a.length-1]}` : `${a[0]}`; };
+  $('#runners').innerHTML = `<table><thead><tr><th>Runner</th><th class="r">Relays</th><th>Span</th><th>Route sections run (1 · 2 · 3 · 4)</th><th>Lean, current form (▲ / ▼ avg pos)</th><th>Most frequent partner</th></tr></thead><tbody>
+    ${list.map(o => { const top = Object.entries(o.partners).sort((a, b) => b[1]-a[1])[0], c = CL[o.name];
+      const df = c && c.uF != null && c.dF != null ? c.dF - c.uF : null, nums = df != null ? `<span class="muted num">${Math.round(c.uF)} / ${Math.round(c.dF)}</span>` : '';
+      const lean = df == null ? '<span class="muted">—</span>' : df > 3 ? `<span class="c-U">▲ climber</span> ${nums}` : df < -3 ? `<span class="c-D">▼ descender</span> ${nums}` : `<span class="muted">even</span> ${nums}`;
+      return `<tr class="click" data-n="${esc(o.name)}" tabindex="0"><td>${esc(o.name)}</td><td class="r num">${o.years.size}</td><td class="num">${ys(o)}</td>
+      <td class="num">${o.legs.map(c => c ? `<b>${c}</b>` : '<span class="muted">·</span>').join(' · ')}</td><td>${lean}</td><td>${esc(top[0])}${top[1] > 1 ? ` <span class="muted num">×${top[1]}</span>` : ''}</td></tr>`; }).join('')}
+  </tbody></table>`;
+  const go = ev => { const tr = ev.target.closest('tr[data-n]'); if (tr) showRunner(tr.dataset.n, true); };
+  $('#runners').addEventListener('click', go);
+  $('#runners').addEventListener('keydown', ev => { if (ev.key === 'Enter') go(ev); });
+})();
+
+/* ---------- heat maps ---------- */
+function renderHeatLegs() {
+  const mode = $('#hmLegMode').value, best = {};
+  RUNS.filter(r => !r.short).forEach(r => { const k = r.sec + r.dir; best[k] = Math.min(best[k] ?? Infinity, r.time); });
+  const fullBest = Math.min(...RACED.filter(r => r.y !== 2017).map(r => r.total));
+  const rows = RACED.slice().sort((a, b) => b.y - a.y).map(r => {
+    const cells = SECTIONS.map(s => {
+      const runs = r.runs.filter(x => x.sec === s.id);
+      if (!runs.length) return '<td class="muted">·</td>';
+      const x = runs[0], t = mode === 'pos' ? (x.pos ? posT(x.pos) : null) : (x.short ? null : pctT(x.time / best[x.sec + x.dir] - 1));
+      const lab = (x.n !== s.id || x.dir === 'rev' || x.short) ? `L${x.n}${x.dir === 'rev' ? ' rev' : ''}` : '';
+      const pct = x.short ? '' : `+${Math.round((x.time / best[x.sec + x.dir] - 1) * 100)}%`;
+      const extra = runs.slice(1).map(y => `<small>L${y.n}${y.dir === 'rev' ? ' rev' : ''} ${fmtL(y.time)}</small>`).join('');
+      return `<td class="hc" data-id="${x.id}" style="${heatBg(t)}" title="${r.y} Leg ${x.n}: ${esc(x.a)} & ${esc(x.b)}, ${fmtL(x.time)}${x.pos ? ', ' + ord(x.pos) + ' on leg' : ''}${pct ? ', ' + pct + ' on club best' : ''}">${fmtL(x.time)}<small>${mode === 'pos' ? (x.pos ? ord(x.pos) : '–') : pct}${lab ? ' · ' + lab : ''}</small>${extra}</td>`;
+    }).join('');
+    const tt = mode === 'pos' ? posT(r.pos) : (r.y === 2017 ? null : pctT(r.total / fullBest - 1));
+    return `<tr><td class="yr num">${r.y}<span class="tag">${r.cat === 'Mixed' ? 'Mix' : 'Open'}</span></td>${cells}<td class="hc tot" data-team="${r.cps ? r.y : ''}" style="${heatBg(tt)}">${fmt(r.total, true)}<small>${mode === 'pos' ? ord(r.pos) : (r.y === 2017 ? 'short' : '+' + Math.round((r.total / fullBest - 1) * 100) + '%')}</small></td></tr>`;
+  }).join('');
+  $('#hmLegs').innerHTML = `<table><thead><tr><th class="yr">Year</th>${SECTIONS.map(s => `<th>Leg ${s.id} route<br><span style="text-transform:none;letter-spacing:0">${esc(s.name)}</span></th>`).join('')}<th>Team total</th></tr></thead><tbody>${rows}</tbody></table>`;
+  $('#hmLegsCap').innerHTML = `<span class="hlegend"><span>${mode === 'pos' ? '1st' : 'club best'}</span><span class="bar"></span><span>${mode === 'pos' ? '60th+' : '+35% or slower'}</span></span> Legs sit under the stretch of fell they cover; a tag shows that year's own leg number (rev = run the other way). Reversed runs are compared with other reversed runs. ${mode === 'pos' ? 'Grey cells have no recorded leg position.' : '2017 is the short course and is not compared.'}`;
+}
+const HCOLS = ['Angle Tarn','Path/Stream Jn','Hartsop','High Street','Caudale Moor',"Raven's Crag",'Kirkstone','Red Screes','Pile of Stones','Handover','Footbridge','Hart Crag','St Sunday Crag','Thornhow End','Patterdale'];
+const colOf = n => NORM(n) === 'BW' ? 'Handover' : n;
+function renderHeatSplits() {
+  const mode = $('#hmSplitMode').value;
+  const races = SPLIT.filter(r => r.y >= 2011 && r.y !== 2017);
+  const segKey = (r, k) => key(r.cps[k]) + '|' + key(r.cps[k+1]);
+  const best = {}, count = {};
+  races.forEach(r => r.split.forEach((s, k) => { const sk = segKey(r, k); best[sk] = Math.min(best[sk] ?? Infinity, s); count[sk] = (count[sk] || 0) + 1; }));
+  const ref = byYear[2022];
+  const head = HCOLS.map(c => { const i = ref.cps.findIndex((n, j) => j > 0 && colOf(n) === c); const g = i > 0 ? cls(ref.cps[i-1], ref.cps[i]) : 'M';
+    return `<th>${glyph(g)}<br>${esc(c === 'Handover' ? 'H/O 3' : sh(c))}</th>`; }).join('');
+  const rows = races.map(r => {
+    const byCol = {};
+    r.split.forEach((s, k) => { byCol[colOf(r.cps[k+1])] = k; });
+    const cells = HCOLS.map(c => {
+      const k = byCol[c]; if (k == null) return '<td class="muted">·</td>';
+      const sk = segKey(r, k), s = r.split[k], p = r.spPos ? r.spPos[k] : null, f = s / best[sk] - 1;
+      const t = mode === 'pos' ? (p ? posT(p) : null) : (count[sk] > 1 ? pctT(f) : null);
+      return `<td class="hc" data-y="${r.y}" data-k="${k}" style="${heatBg(t)}" title="${r.y}: ${esc(r.cps[k])} → ${esc(r.cps[k+1])} ${fmt(s)}${p ? ', ' + ord(p) + ' in field' : ''}${count[sk] > 1 ? ', +' + Math.round(f*100) + '% on club best ' + fmt(best[sk]) : ''}">${fmt(s)}<small>${mode === 'pos' ? (p ? ord(p) : '–') : (count[sk] > 1 ? '+' + Math.round(f*100) + '%' : '')}</small></td>`;
+    }).join('');
+    return `<tr><td class="yr num">${r.y}</td>${cells}<td class="hc tot" data-team="${r.y}" style="${heatBg(mode === 'pos' ? posT(r.pos) : null)}">${fmt(r.total, true)}<small>${ord(r.pos)}</small></td></tr>`;
+  }).join('');
+  $('#hmSplits').innerHTML = `<table><thead><tr><th class="yr">Year</th>${head}<th>Total</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function heatClick(ev) {
+  const td = ev.target.closest('td.hc'); if (!td) return;
+  if (td.dataset.id) addEntry(RUNS.find(r => r.id === td.dataset.id));
+  else if (td.dataset.team) addEntry(+td.dataset.team);
+  else if (td.dataset.y) { const r = byYear[+td.dataset.y], k = +td.dataset.k; const run = r.runs.find(x => { const i0 = x.n > 1 ? r.legEnds[x.n-2] : 0, i1 = r.legEnds[x.n-1]; return k >= i0 && k < i1; }); if (run) addEntry(run); }
+  else return;
+  box.scrollIntoView({behavior:smooth(), block:'center'});
+}
+$('#hmLegs').addEventListener('click', heatClick); $('#hmSplits').addEventListener('click', heatClick);
+$('#hmLegMode').addEventListener('change', renderHeatLegs); $('#hmSplitMode').addEventListener('change', renderHeatSplits);
+renderHeatLegs(); renderHeatSplits();
+
+/* ---------- runner card: bests in 5-year periods from first relay ---------- */
+const byName = Object.values(R).sort((a, b) => a.name.split(' ').slice(1).join(' ').localeCompare(b.name.split(' ').slice(1).join(' ')) || a.name.localeCompare(b.name));
+$('#rSel').innerHTML = byName.map(o => `<option value="${esc(o.name)}">${esc(o.name.split(' ').slice(1).join(' '))}, ${esc(o.name.split(' ')[0])} (${o.years.size})</option>`).join('');
+let eraBest = {};
+function showRunner(name, scroll) {
+  const o = R[name]; $('#rSel').value = name;
+  const yrs = [...o.years].sort((a, b) => a - b), first = yrs[0], blocks = [];
+  for (let s = first; s <= REF; s += 5) blocks.push([s, s + 4]);
+  const c = CL[name] || {U:[], D:[], M:[]};
+  eraBest = {1:[], 2:[], 3:[], 4:[]};
+  const rows = blocks.map(([s, e]) => {
+    const runs = o.runs.filter(r => r.year >= s && r.year <= e), ys = [...new Set(runs.map(r => r.year))].sort();
+    if (!runs.length) return `<tr><td class="num">${s}–${e}</td><td colspan="7" class="muted">No relays</td></tr>`;
+    const secCells = SECTIONS.map(sec => {
+      const fwd = runs.filter(r => r.sec === sec.id && r.dir === 'fwd' && !r.short).sort((a, b) => a.time - b.time);
+      const other = runs.filter(r => r.sec === sec.id && (r.dir === 'rev' || r.short)).sort((a, b) => a.time - b.time);
+      if (fwd.length) { eraBest[sec.id].push(fwd[0]); return `<td class="r"><span class="num">${fmtL(fwd[0].time)}</span>${chip(fwd[0].pos)}<div class="muted num" style="font-size:.7rem">${fwd[0].year} L${fwd[0].n} · with ${esc((p => p[0] + '. ' + surname(p))(fwd[0].a === name ? fwd[0].b : fwd[0].a))}</div></td>`; }
+      if (other.length) return `<td class="r muted"><span class="num">${fmtL(other[0].time)}</span><div style="font-size:.7rem">${other[0].year} ${other[0].short ? 'short' : 'reversed'}</div></td>`;
+      return '<td class="r muted">·</td>';
+    }).join('');
+    const pick = arr => arr.filter(x => x.year >= s && x.year <= e).map(x => x.p);
+    const U = pick(c.U), Dn = pick(c.D);
+    const ud = arr => arr.length ? `${chip(Math.min(...arr))} <span class="muted num">avg ${Math.round(avg(arr))}</span>` : '<span class="muted">—</span>';
+    return `<tr><td class="num">${s}–${e}<div class="muted" style="font-size:.7rem">${ys.join(', ')}</div></td><td class="r num">${ys.length}</td>${secCells}<td>${ud(U)}</td><td>${ud(Dn)}</td></tr>`;
+  }).join('');
+  const head = SECTIONS.map(sec => `<th class="r">Leg ${sec.id} route${eraBest[sec.id].length > 1 ? `<br><button data-race="${sec.id}" style="font-size:.66rem;padding:1px 6px;margin-top:3px">Race periods</button>` : ''}</th>`).join('');
+  const form = c.uF != null && c.dF != null ? ` Current form: ${ord(Math.round(c.uF))} on climbs, ${ord(Math.round(c.dF))} on descents.` : '';
+  $('#eras').innerHTML = `<table><thead><tr><th>Period</th><th class="r">Relays</th>${head}<th>▲ best · avg</th><th>▼ best · avg</th></tr></thead><tbody>${rows}</tbody></table>`;
+  $('#eraCap').textContent = `${o.name}: first relay ${first}, ${o.years.size} relays.${form} Leg times are the best in each period on the stretch as run today, with that year's leg number and partner; grey times were the reversed or short course. Split positions are only available for 2009–10 and 2015–24.`;
+  if (scroll) $('#rDetail').scrollIntoView({behavior:smooth(), block:'start'});
+}
+$('#rSel').addEventListener('change', e => showRunner(e.target.value));
+$('#eras').addEventListener('click', ev => { const b = ev.target.closest('[data-race]'); if (b) { setEntries(eraBest[+b.dataset.race].slice(-6)); box.scrollIntoView({behavior:smooth(), block:'center'}); } });
+$('#rRecent').addEventListener('click', () => loadRunner($('#rSel').value));
+
+/* ---------- boot ---------- */
+computeCL(); renderClimbStats();
+showRunner("Tom Ferrington");
+setTerrainBadge(0);
+loadLiveTerrain().then(g => { if (terrainSrc !== 'model') return; HG.set(g); TPS.set(g); terrainSrc = 'live'; setTerrainBadge(100); rebuildAll(); }).catch(() => {});
+updateTerrainGeometry();
+resize();
+renderDumb();
+setEntries(groupRuns(2, 'fwd').sort((a, b) => a.time - b.time).slice(0, 6));
+$('#qSec').value = 2;
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
