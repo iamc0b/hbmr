@@ -1,0 +1,47 @@
+# Launchpad default .gitignore: code and structure go to Git, data stays on each machine
+
+# Dependencies and environments (rebuilt by each machine's setup)
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.dart_tool/
+
+# Secrets and machine-specific config (commit the *.example version instead)
+.env
+.env.*
+!.env.example
+secrets*.toml
+!secrets.example*.toml
+config.ini
+config.json
+settings.local.json
+*.pem
+*.key
+*.pfx
+
+# Data, backups and logs
+data/*
+!data/README.md
+!data/.gitkeep
+backups/
+chrome-profile/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+*.csv
+*.xlsx
+*.xls
+*.zip
+*.7z
+*.bak
+
+# Installers and binaries
+*.exe
+*.msi
+
+# OS clutter
+Thumbs.db
+.DS_Store
